@@ -655,7 +655,6 @@ parameters (constants : SortedSet Name,
   schDef n (MkNmFun [] exp)
      = pure $ "(define " ++ schName !(getFullName n) ++ "(delay "
                       ++ !(schExp 0 exp) ++ "))\n"
-
   schDef n (MkNmFun args exp)
      = pure $ "(define " ++ schName !(getFullName n) ++ " (lambda (" ++ schArglist args ++ ") "
                       ++ !(schExp 0 exp) ++ "))\n"
