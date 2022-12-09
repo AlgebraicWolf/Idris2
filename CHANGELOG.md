@@ -28,14 +28,7 @@
 
 #### Chez
 
-* Non-recursive top-level constants are compiled to eagerly evaluated
-  constants in Chez Scheme.
-
-#### Node.js/Browser
-
-* Generated JavaScript files now include a shebang when using the Node.js backend
-* NodeJS now supports `popen`/`pclose` for the `Read` mode.
-* `getChar` is now supported on Node.js and `putChar` is supported on both JavaScript backends.
+* Use `delay` and `force` to lazily compute top-level constants.
 
 ### Compiler changes
 
