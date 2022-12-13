@@ -28,12 +28,6 @@
 
 ### Backend changes
 
-#### Chez
-
-* `Lazy` values are *weakly* memoised. That is, once accessed, they are allowed
-  to be not re-evaluated until garbage collector wipes them.
-  Unlike `Lazy`, `Inf` values are not memoised.
-
 #### RefC
 
 * Adds support for `CFLAGS`, `CPPFLAGS`, and `LDFLAGS` to facilitate building on
@@ -46,11 +40,17 @@
 * Non-recursive top-level constants are compiled to eagerly evaluated
   constants in Chez Scheme.
 
+* `Lazy` values are *weakly* memoised. That is, once accessed, they are allowed
+  to be not re-evaluated until garbage collector wipes them.
+
 #### Racket
 
 * FFI declarations can now specify which `require` to perform, i.e. which
   library to load before executing the FFI.
   The syntax is `scheme,racket:my-function,my-library`.
+
+* `Lazy` values are *weakly* memoised. That is, once accessed, they are allowed
+  to be not re-evaluated until garbage collector wipes them.
 
 #### Node.js/Browser
 
