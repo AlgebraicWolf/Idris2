@@ -651,7 +651,7 @@ parameters (constants : SortedSet Name,
                                 ++ " " ++ show args))
 
   schDef : {auto c : Ref Ctxt Defs} ->
-           Name -> NamedDef -> Core String
+           Name -> NamedDef -> Core Builder
   schDef n (MkNmFun [] exp)
      = pure $ "(define " ++ schName !(getFullName n) ++ "(delay "
                       ++ !(schExp 0 exp) ++ "))\n"
