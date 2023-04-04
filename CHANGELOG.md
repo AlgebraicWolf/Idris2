@@ -39,6 +39,13 @@
 
 * Non-recursive top-level constants are compiled to eagerly evaluated
   constants in Chez Scheme.
+* Top-level functions without arguments consisting of delayed expressions
+  are now compiled using Scheme's `delay` and `force` to memoize them.
+
+#### Racket
+
+* Top-level functions without arguments consisting of delayed expressions
+  are now compiled using Scheme's `delay` and `force` to memoize them.
 
 #### Racket
 
