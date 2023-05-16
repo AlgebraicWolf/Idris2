@@ -86,6 +86,8 @@
 
 * Constant folding of trivial let statements and `believe_me`.
 
+* Fixed a bug that caused holes to appear unexpectedly during quotation of dependent pairs.
+
 ### Library changes
 
 #### Prelude
