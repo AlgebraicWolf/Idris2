@@ -149,6 +149,7 @@ elabScript rig fc nest env script@(NDCon nfc nm t ar args) exp
              nf empty env checktm
     elabCon defs "Quote" [exp, tm]
         = do tm' <- evalClosure defs tm
+             unverifiedLogC "reflection.quote" 0 $ do pure (show tm')
              defs <- get Ctxt
              empty <- clearDefs defs
              scriptRet $ map rawName !(unelabUniqueBinders env !(quote empty env tm'))
