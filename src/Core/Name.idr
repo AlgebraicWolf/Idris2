@@ -174,7 +174,7 @@ export
 nameRoot : Name -> String
 nameRoot (NS _ n) = nameRoot n
 nameRoot (UN n) = displayUserName n
-nameRoot (MN n _) = n
+nameRoot (MN n i) = n ++ show i
 nameRoot (PV n _) = nameRoot n
 nameRoot (DN _ n) = nameRoot n
 nameRoot (Nested _ inner) = nameRoot inner
