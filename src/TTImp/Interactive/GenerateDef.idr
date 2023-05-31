@@ -49,8 +49,8 @@ uniqueRHS (PatClause fc lhs rhs)
     mkUniqueName : RawImp -> Core RawImp
     mkUniqueName (IHole fc' rhsn)
         = do defs <- get Ctxt
-             rhsn' <- uniqueHoleName defs [] rhsn
-             pure (IHole fc' rhsn')
+             rhsn' <- uniqueHoleName defs [] (nameRoot rhsn)
+             pure (IHole fc' (UN $ Basic rhsn'))
     mkUniqueName tm = pure tm -- it'll be a hole, but this is needed for covering
 uniqueRHS c = pure c
 
@@ -233,7 +233,7 @@ makeDefFromType loc opts n envlen ty
              rhshole <- uniqueHoleName defs [] (fnName False n ++ "_rhs")
              let initcs = PatClause loc
                                 (apply (IVar loc n) (pre_env ++ (map (IBindVar loc) argns)))
-                                (IHole loc rhshole)
+                                (IHole loc (UN $ Basic rhshole))
              let Just nidx = getNameID n (gamma defs)
                  | Nothing => undefinedName loc n
              cs' <- mkSplits loc opts nidx initcs

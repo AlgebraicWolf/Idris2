@@ -228,12 +228,21 @@ mutual
            pure (IVar fc (MkKindedName (Just nt) fn n'), gnf env (embed ty))
   unelabTy' umode nest env (Meta fc n i args)
       = do defs <- get Ctxt
-           let mkn = nameRoot n
+           let n' = quotedName n
            Just ty <- lookupTyExact (Resolved i) (gamma defs)
                | Nothing => case umode of
                                  ImplicitHoles => pure (Implicit fc True, gErased fc)
-                                 _ => pure (IHole fc mkn, gErased fc)
-           pure (IHole fc mkn, gnf env (embed ty))
+                                 _ => pure (IHole fc n', gErased fc)
+           pure (IHole fc n', gnf env (embed ty))
+      where
+        quotedName : Name -> Name
+        quotedName (NS mi n1) = NS mi $ quotedName n1
+        quotedName (MN str j) = MN str (100000 + j)
+        quotedName x = x
+        -- quotedNS : Name -> Name
+        -- quotedNS nm = let (ns, rest) = splitNS nm
+        --                   in NS (mkNestedNamespace (Just ns) "quoted") rest
+
   unelabTy' umode nest env (Bind fc x b sc)
       = do (sc', scty) <- unelabTy umode nest (b :: env) sc
            case umode of
@@ -400,7 +409,7 @@ unelabNest : {vars : _} ->
              Term vars -> Core IRawImp
 unelabNest nest env (Meta fc n i args)
     = do let mkn = nameRoot n ++ showScope args
-         pure (IHole fc mkn)
+         pure (IHole fc (UN $ Basic mkn))
   where
     toName : Term vars -> Maybe Name
     toName (Local _ _ idx p) = Just (nameAt p)

@@ -37,7 +37,7 @@ parameters
     ty <- unelab env ty
     defs <- get Ctxt
     new_hole <- uniqueHoleName defs [] (nameRoot hole)
-    let iintrod = ILam replFC rig Explicit (Just x) ty (IHole replFC new_hole)
+    let iintrod = ILam replFC rig Explicit (Just x) ty (IHole replFC (UN $ Basic new_hole))
     pure iintrod
 
   introCon : Name -> Term lhsCtxt -> Core (List IRawImp)
@@ -55,7 +55,7 @@ parameters
         | _ => pure Nothing
       let nargs = lengthExplicitPi $ fst $ snd $ underPis (-1) [] (type gdef)
       new_hole_names <- uniqueHoleNames defs nargs (nameRoot hole)
-      let new_holes = PHole replFC True <$> new_hole_names
+      let new_holes = PHole replFC True <$> UN . Basic <$> new_hole_names
       let pcons = papply replFC (PRef replFC cons) new_holes
       res <- catch
         (do -- We're desugaring it to the corresponding TTImp

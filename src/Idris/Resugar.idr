@@ -360,7 +360,7 @@ mutual
                                !(toPTerm startPrec tm))
   toPTerm p (ICoerced fc tm) = toPTerm p tm
   toPTerm p (IPrimVal fc c) = pure (PPrimVal fc c)
-  toPTerm p (IHole fc str) = pure (PHole fc False str)
+  toPTerm p (IHole fc n) = pure (PHole fc False n)
   toPTerm p (IType fc) = pure (PType fc)
   toPTerm p (IBindVar fc v)
     = let nm = UN (Basic v) in

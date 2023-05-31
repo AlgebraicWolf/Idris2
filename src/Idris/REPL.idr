@@ -582,7 +582,7 @@ processEdit (Refine upd line hole e)
                     -- because of defaulting instances.
                     let n = minus size_tele_fun size_tele_hole
                     ns <- uniqueHoleNames defs n (nameRoot hole)
-                    let new_holes = PHole replFC True <$> ns
+                    let new_holes = PHole replFC True <$> UN . Basic <$> ns
                     let pcall = papply replFC e new_holes
 
                     -- We're desugaring it to the corresponding TTImp
