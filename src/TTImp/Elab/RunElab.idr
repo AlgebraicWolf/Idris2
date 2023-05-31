@@ -152,7 +152,10 @@ elabScript rig fc nest env script@(NDCon nfc nm t ar args) exp
              unverifiedLogC "reflection.quote" 0 $ do pure (show tm')
              defs <- get Ctxt
              empty <- clearDefs defs
-             scriptRet $ map rawName !(unelabUniqueBinders env !(quote empty env tm'))
+             afterQuote <- quote empty env tm'
+             -- ?what
+             unverifiedLogC "reflection.quote" 0 $ do pure (show afterQuote)
+             scriptRet $ map rawName !(unelabUniqueBinders env afterQuote)
     elabCon defs "Lambda" [x, _, scope]
         = do empty <- clearDefs defs
              NBind bfc x (Lam fc' c p ty) sc <- evalClosure defs scope
