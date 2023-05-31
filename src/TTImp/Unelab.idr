@@ -233,7 +233,7 @@ mutual
                | Nothing => case umode of
                                  ImplicitHoles => pure (Implicit fc True, gErased fc)
                                  _ => pure (IHole fc mkn, gErased fc)
-           pure (IHole fc mkn, gnf env (embed ty))
+           pure (IHole fc (mkn ++ "0"), gnf env (embed ty))
   unelabTy' umode nest env (Bind fc x b sc)
       = do (sc', scty) <- unelabTy umode nest (b :: env) sc
            case umode of
