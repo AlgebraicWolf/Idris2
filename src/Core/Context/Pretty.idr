@@ -2,6 +2,7 @@ module Core.Context.Pretty
 
 import Core.Context
 import Core.Env
+import Core.UnifyState
 
 import Data.String
 import Idris.Doc.Annotations
@@ -90,6 +91,7 @@ namespace Resugared
   export
   prettyDef : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Def -> Core (Doc IdrisDocAnn)
   prettyDef None = pure "undefined"
   prettyDef (PMDef _ args ct _ pats) = do

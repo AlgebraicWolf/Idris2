@@ -4,6 +4,7 @@ import Core.Case.CaseTree
 import Core.Case.CaseTree.Pretty
 import Core.Context
 import Core.Env
+import Core.UnifyState
 
 import Data.String
 
@@ -21,6 +22,7 @@ import Idris.Syntax.Views
 export
 displayType : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               (shortName : Bool) -> Defs -> (Name, Int, GlobalDef) ->
               Core (Doc IdrisSyntax)
 displayType shortName defs (n, i, gdef)
@@ -35,6 +37,7 @@ displayType shortName defs (n, i, gdef)
 export
 displayTerm : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Defs -> ClosedTerm ->
               Core (Doc IdrisSyntax)
 displayTerm defs tm
@@ -44,6 +47,7 @@ displayTerm defs tm
 export
 displayClause : {auto c : Ref Ctxt Defs} ->
                 {auto s : Ref Syn SyntaxInfo} ->
+                {auto u : Ref UST UState} ->
                 Defs -> (vs ** (Env Term vs, Term vs, Term vs)) ->
                 Core (Doc IdrisSyntax)
 displayClause defs (vs ** (env, lhs, rhs))
@@ -59,6 +63,7 @@ displayClause defs (vs ** (env, lhs, rhs))
 export
 displayPats : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               (shortName : Bool) -> Defs -> (Name, Int, GlobalDef) ->
               Core (Doc IdrisSyntax)
 displayPats shortName defs (n, idx, gdef)
@@ -72,6 +77,7 @@ displayPats shortName defs (n, idx, gdef)
 export
 displayImpl : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Defs -> (Name, Int, GlobalDef) ->
               Core (Doc IdrisSyntax)
 displayImpl defs (n, idx, gdef)

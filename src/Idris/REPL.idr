@@ -107,6 +107,7 @@ showInfo (n, idx, d)
 
 prettyInfo : {auto c : Ref Ctxt Defs} ->
              {auto s : Ref Syn SyntaxInfo} ->
+             {auto u : Ref UST UState} ->
              (Name, Int, GlobalDef) -> Core (Doc IdrisDocAnn)
 prettyInfo (n, idx, d)
     = do let nm = fullname d
@@ -157,6 +158,7 @@ getEnvTerm _ env tm = (_ ** (env, tm))
 
 displayPatTerm : {auto c : Ref Ctxt Defs} ->
                  {auto s : Ref Syn SyntaxInfo} ->
+                 {auto u : Ref UST UState} ->
                  Defs -> ClosedTerm ->
                  Core String
 displayPatTerm defs tm

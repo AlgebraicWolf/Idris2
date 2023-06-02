@@ -98,6 +98,7 @@ addDefaults fc impName params allms defs body
 
 getMethImps : {vars : _} ->
               {auto c : Ref Ctxt Defs} ->
+              {auto u : Ref UST UState} ->
               Env Term vars -> Term vars ->
               Core (List (Name, RigCount, RawImp))
 getMethImps env (Bind fc x (Pi fc' c Implicit ty) sc)

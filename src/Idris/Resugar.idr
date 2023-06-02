@@ -4,6 +4,7 @@ import Core.Context
 import Core.Context.Log
 import Core.Env
 import Core.Options
+import Core.UnifyState
 
 import Idris.Syntax
 import Idris.Syntax.Traversals
@@ -602,6 +603,7 @@ export
 resugar : {vars : _} ->
           {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Env Term vars -> Term vars -> Core IPTerm
 resugar env tm
     = do tti <- unelab env tm
@@ -611,6 +613,7 @@ export
 resugarNoPatvars : {vars : _} ->
                    {auto c : Ref Ctxt Defs} ->
                    {auto s : Ref Syn SyntaxInfo} ->
+                   {auto u : Ref UST UState} ->
                    Env Term vars -> Term vars -> Core IPTerm
 resugarNoPatvars env tm
     = do tti <- unelabNoPatvars env tm

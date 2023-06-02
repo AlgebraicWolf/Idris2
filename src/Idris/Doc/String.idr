@@ -6,6 +6,7 @@ import Core.Core
 import Core.Env
 import Core.TT
 import Core.TT.Traversals
+import Core.UnifyState
 
 import Idris.Doc.Display
 import Idris.Pretty
@@ -84,6 +85,7 @@ prettyKindedName (Just kw) nm
 export
 prettyType : {auto c : Ref Ctxt Defs} ->
              {auto s : Ref Syn SyntaxInfo} ->
+             {auto u : Ref UST UState} ->
              (IdrisSyntax -> ann) -> ClosedTerm -> Core (Doc ann)
 prettyType syn ty = do
   defs <- get Ctxt
@@ -95,6 +97,7 @@ prettyType syn ty = do
 ||| Look up implementations
 getImplDocs : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               (keep : Term [] -> Core Bool) ->
               Core (List (Doc IdrisDocAnn))
 getImplDocs keep
@@ -122,6 +125,7 @@ getImplDocs keep
 ||| Look up implementations corresponding to the named type
 getHintsForType : {auto c : Ref Ctxt Defs} ->
                   {auto s : Ref Syn SyntaxInfo} ->
+                  {auto u : Ref UST UState} ->
                   Name -> Core (List (Doc IdrisDocAnn))
 getHintsForType nty
     = do log "doc.data" 10 $ "Looking at \{show nty}"
@@ -136,6 +140,7 @@ getHintsForType nty
 ||| Look up implementations corresponding to the primitive type
 getHintsForPrimitive : {auto c : Ref Ctxt Defs} ->
                        {auto s : Ref Syn SyntaxInfo} ->
+                       {auto u : Ref UST UState} ->
                        Constant -> Core (List (Doc IdrisDocAnn))
 getHintsForPrimitive c
     = do log "doc.data" 10 $ "Looking at \{show c}"
@@ -150,6 +155,7 @@ getHintsForPrimitive c
 export
 getDocsForPrimitive : {auto c : Ref Ctxt Defs} ->
                       {auto s : Ref Syn SyntaxInfo} ->
+                      {auto u : Ref UST UState} ->
                       Constant -> Core (Doc IdrisDocAnn)
 getDocsForPrimitive constant = do
     let (_, type) = checkPrim EmptyFC constant
@@ -243,6 +249,7 @@ export
 getDocsForName : {auto o : Ref ROpts REPLOpts} ->
                  {auto c : Ref Ctxt Defs} ->
                  {auto s : Ref Syn SyntaxInfo} ->
+                 {auto u : Ref UST UState} ->
                  FC -> Name -> Config -> Core (Doc IdrisDocAnn)
 getDocsForName fc n config
     = do syn <- get Syn
@@ -481,6 +488,7 @@ export
 getDocsForImplementation :
   {auto s : Ref Syn SyntaxInfo} ->
   {auto c : Ref Ctxt Defs} ->
+  {auto u : Ref UST UState} ->
   PTerm -> Core (Maybe (Doc IdrisSyntax))
 getDocsForImplementation t = do
   -- the term better be of the shape (I e1 e2 e3) where I is a name
@@ -548,6 +556,7 @@ export
 getDocsForPTerm : {auto o : Ref ROpts REPLOpts} ->
                   {auto c : Ref Ctxt Defs} ->
                   {auto s : Ref Syn SyntaxInfo} ->
+                  {auto u : Ref UST UState} ->
                   PTerm -> Core (Doc IdrisDocAnn)
 getDocsForPTerm (PRef fc name) = getDocsForName fc name MkConfig
 getDocsForPTerm (PPrimVal _ c) = getDocsForPrimitive c
@@ -652,6 +661,7 @@ export
 getDocs : {auto o : Ref ROpts REPLOpts} ->
           {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           DocDirective -> Core (Doc IdrisDocAnn)
 getDocs (APTerm ptm) = getDocsForPTerm ptm
 getDocs (Symbol k) = pure $ getDocsForSymbol k
@@ -665,6 +675,7 @@ getDocs (AModule mod) = do
 
 summarise : {auto c : Ref Ctxt Defs} ->
             {auto s : Ref Syn SyntaxInfo} ->
+            {auto u : Ref UST UState} ->
             Name -> Core (Doc IdrisDocAnn)
 summarise n -- n is fully qualified
     = do defs <- get Ctxt
@@ -681,6 +692,7 @@ export
 getContents : {auto o : Ref ROpts REPLOpts} ->
               {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Namespace -> Core (Doc IdrisDocAnn)
 getContents ns
    = -- Get all the names, filter by any that match the given namespace

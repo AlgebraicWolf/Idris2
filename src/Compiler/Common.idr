@@ -16,6 +16,7 @@ import Core.Directory
 import Core.Options
 import Core.TT
 import Core.TTC
+import Core.UnifyState
 import Libraries.Data.IOArray
 import Libraries.Utils.Scheme
 
@@ -37,11 +38,11 @@ public export
 record Codegen where
   constructor MkCG
   ||| Compile an Idris 2 expression, saving it to a file.
-  compileExpr : Ref Ctxt Defs -> Ref Syn SyntaxInfo ->
+  compileExpr : Ref Ctxt Defs -> Ref Syn SyntaxInfo -> Ref UST UState ->
                 (tmpDir : String) -> (outputDir : String) ->
                 ClosedTerm -> (outfile : String) -> Core (Maybe String)
   ||| Execute an Idris 2 expression directly.
-  executeExpr : Ref Ctxt Defs -> Ref Syn SyntaxInfo ->
+  executeExpr : Ref Ctxt Defs -> Ref Syn SyntaxInfo -> Ref UST UState ->
                 (tmpDir : String) -> ClosedTerm -> Core ()
   ||| Incrementally compile definitions in the current module (toIR defs)
   ||| if supported
@@ -103,16 +104,17 @@ record CompileData where
 export
 compile : {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Codegen ->
           ClosedTerm -> (outfile : String) -> Core (Maybe String)
-compile {c} {s} cg tm out
+compile {c} {s} {u} cg tm out
     = do d <- getDirs
          let tmpDir = execBuildDir d
          let outputDir = outputDirWithDefault d
          ensureDirectoryExists tmpDir
          ensureDirectoryExists outputDir
          logTime 1 "Code generation overall" $
-             compileExpr cg c s tmpDir outputDir tm out
+             compileExpr cg c s u tmpDir outputDir tm out
 
 ||| execute
 ||| As with `compile`, produce a functon that executes
@@ -120,12 +122,13 @@ compile {c} {s} cg tm out
 export
 execute : {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Codegen -> ClosedTerm -> Core ()
-execute {c} {s} cg tm
+execute {c} {s} {u} cg tm
     = do d <- getDirs
          let tmpDir = execBuildDir d
          ensureDirectoryExists tmpDir
-         executeExpr cg c s tmpDir tm
+         executeExpr cg c s u tmpDir tm
 
 export
 incCompile : {auto c : Ref Ctxt Defs} ->

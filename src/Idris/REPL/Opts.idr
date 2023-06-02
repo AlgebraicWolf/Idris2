@@ -12,7 +12,8 @@ import Libraries.Data.Tap
 import Data.String
 import System.File
 
-%default total
+-- %default total
+%default covering
 
 namespace VerbosityLvl
   public export

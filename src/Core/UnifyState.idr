@@ -203,6 +203,7 @@ addHoleName : {auto u : Ref UST UState} ->
 addHoleName fc n i = update UST { holes $= insert i (fc, n),
                                   currentHoles $= insert i (fc, n) }
 
+export
 addGuessName : {auto u : Ref UST UState} ->
                FC -> Name -> Int -> Core ()
 addGuessName fc n i = update UST { guesses $= insert i (fc, n) }

@@ -8,6 +8,7 @@ import Core.Directory
 import Core.Options
 import Core.Env
 import Core.Normalise
+import Core.UnifyState
 import Data.List1
 import Data.String
 import Compiler.ES.Ast
@@ -732,6 +733,7 @@ def :  {auto c : Ref Ctxt Defs}
     -> {auto s : Ref Syn SyntaxInfo}
     -> {auto e : Ref ESs ESSt}
     -> {auto nm : Ref NoMangleMap NoMangleMap}
+    -> {auto u : Ref UST UState}
     -> Function
     -> Core String
 def (MkFunction n as body) = do
@@ -789,9 +791,9 @@ validJSName name =
 ||| Compiles the given `ClosedTerm` for the list of supported
 ||| backends to JS code.
 export
-compileToES : Ref Ctxt Defs -> Ref Syn SyntaxInfo ->
+compileToES : Ref Ctxt Defs -> Ref Syn SyntaxInfo -> Ref UST UState ->
               (cg : CG) -> ClosedTerm -> List String -> Core String
-compileToES c s cg tm ccTypes = do
+compileToES c s u cg tm ccTypes = do
   _ <- initNoMangle ccTypes validJSName
 
   cdata <- getCompileDataWith ccTypes False Cases tm

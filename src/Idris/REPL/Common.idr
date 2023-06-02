@@ -136,6 +136,7 @@ export
 emitError : {auto c : Ref Ctxt Defs} ->
             {auto o : Ref ROpts REPLOpts} ->
             {auto s : Ref Syn SyntaxInfo} ->
+            {auto u : Ref UST UState} ->
             Error -> Core ()
 emitError e = emitProblem e display perror getErrorLoc MsgStatusError
 
@@ -143,6 +144,7 @@ export
 emitWarning : {auto c : Ref Ctxt Defs} ->
               {auto o : Ref ROpts REPLOpts} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Warning -> Core ()
 emitWarning w = emitProblem w displayWarning pwarning (Just . getWarningLoc) MsgStatusInfo
 
@@ -150,6 +152,7 @@ export
 emitWarnings : {auto c : Ref Ctxt Defs} ->
                {auto o : Ref ROpts REPLOpts} ->
                {auto s : Ref Syn SyntaxInfo} ->
+               {auto u : Ref UST UState} ->
                Core (List Error)
 emitWarnings
     = do defs <- get Ctxt
@@ -164,6 +167,7 @@ export
 emitWarningsAndErrors : {auto c : Ref Ctxt Defs} ->
                         {auto o : Ref ROpts REPLOpts} ->
                         {auto s : Ref Syn SyntaxInfo} ->
+                        {auto u : Ref UST UState} ->
                         List Error -> Core (List Error)
 emitWarningsAndErrors errs = do
   ws <- emitWarnings
@@ -244,6 +248,7 @@ export
 docsOrSignature : {auto o : Ref ROpts REPLOpts} ->
                   {auto c : Ref Ctxt Defs} ->
                   {auto s : Ref Syn SyntaxInfo} ->
+                  {auto u : Ref UST UState} ->
                   FC -> Name -> Core (Doc IdrisDocAnn)
 docsOrSignature fc n
     = do syn  <- get Syn

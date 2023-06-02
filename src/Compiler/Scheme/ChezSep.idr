@@ -14,6 +14,7 @@ import Core.Context.Log
 import Core.Directory
 import Core.Options
 import Core.TT
+import Core.UnifyState
 import Libraries.Data.SortedSet
 import Libraries.Data.String.Builder
 import Libraries.Utils.Path
@@ -266,9 +267,10 @@ compileExpr :
   Bool ->
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> (outputDir : String) ->
   ClosedTerm -> (outfile : String) -> Core (Maybe String)
-compileExpr makeitso c s tmpDir outputDir tm outfile = do
+compileExpr makeitso c s u tmpDir outputDir tm outfile = do
   -- set up paths
   Just cwd <- coreLift currentDir
        | Nothing => throw (InternalError "Can't get current directory")
@@ -315,9 +317,10 @@ compileExpr makeitso c s tmpDir outputDir tm outfile = do
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> ClosedTerm -> Core ()
-executeExpr c s tmpDir tm
-    = do Just sh <- compileExpr False c s tmpDir tmpDir tm "_tmpchez"
+executeExpr c s u tmpDir tm
+    = do Just sh <- compileExpr False c s u tmpDir tmpDir tm "_tmpchez"
             | Nothing => throw (InternalError "compileExpr returned Nothing")
          coreLift_ $ system [sh]
 

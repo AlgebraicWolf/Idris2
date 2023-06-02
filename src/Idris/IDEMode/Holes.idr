@@ -2,6 +2,7 @@ module Idris.IDEMode.Holes
 
 import Core.Env
 import Core.Context.Log
+import Core.Unify
 
 import Data.String
 
@@ -95,6 +96,7 @@ export
 extractHoleData : {vars : _} ->
           {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Defs -> Env Term vars -> Name -> Nat -> Term vars ->
           Core Holes.Data
 extractHoleData defs env fn (S args) (Bind fc x (Let _ c val ty) sc)
@@ -122,6 +124,7 @@ export
 holeData : {vars : _} ->
            {auto c : Ref Ctxt Defs} ->
            {auto s : Ref Syn SyntaxInfo} ->
+           {auto u : Ref UST UState} ->
            Defs -> Env Term vars -> Name -> Nat -> Term vars ->
            Core Holes.Data
 
@@ -143,6 +146,7 @@ export
 getUserHolesData :
   {auto c : Ref Ctxt Defs} ->
   {auto s : Ref Syn SyntaxInfo} ->
+  {auto u : Ref UST UState} ->
   Core (List Holes.Data)
 getUserHolesData
     = do defs <- get Ctxt
@@ -162,6 +166,7 @@ export
 showHole : {vars : _} ->
           {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Defs -> Env Term vars -> Name -> Nat -> Term vars ->
           Core String
 
@@ -178,6 +183,7 @@ export
 prettyHole : {vars : _} ->
              {auto c : Ref Ctxt Defs} ->
              {auto s : Ref Syn SyntaxInfo} ->
+             {auto u : Ref UST UState} ->
              Defs -> Env Term vars -> Name -> Nat -> Term vars ->
              Core (Doc IdrisSyntax)
 prettyHole defs env fn args ty

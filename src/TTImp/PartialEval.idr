@@ -118,6 +118,7 @@ dropSpec i sargs (x :: xs)
            Just _ => dropSpec (1 + i) sargs xs
 
 getSpecPats : {auto c : Ref Ctxt Defs} ->
+              {auto u : Ref UST UState} ->
               FC -> Name ->
               (fn : Name) -> (stk : List (FC, Term vars)) ->
               NF [] -> -- Type of 'fn'

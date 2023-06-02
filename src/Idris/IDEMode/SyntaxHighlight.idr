@@ -13,7 +13,7 @@ import Data.List
 
 import Libraries.Data.PosMap
 
-%default total
+%default covering
 
 ||| Output some data using current dialog index
 export

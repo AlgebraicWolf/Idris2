@@ -5,6 +5,7 @@ import Core.Context
 import Core.Context.Log
 import Core.Primitives
 import Core.Value
+import Core.UnifyState
 
 import Compiler.Common
 import Compiler.VMCode
@@ -287,14 +288,16 @@ parameters {auto c : Ref Ctxt Defs}
 compileExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   String -> String -> ClosedTerm -> String -> Core (Maybe String)
-compileExpr _ _ _ _ _ _ = throw (InternalError "compile not implemeted for vmcode-interp")
+compileExpr _ _ _ _ _ _ _ = throw (InternalError "compile not implemeted for vmcode-interp")
 
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   String -> ClosedTerm -> Core ()
-executeExpr c s _ tm = do
+executeExpr c s u _ tm = do
     cdata <- getCompileData False VMCode tm
     st <- newRef State !(initInterpState cdata.vmcode)
     ignore $ callFunc [] (MN "__mainExpression" 0) []

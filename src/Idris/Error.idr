@@ -4,6 +4,7 @@ import Core.Core
 import Core.Context
 import Core.Env
 import Core.Options
+import Core.UnifyState
 
 import Idris.Doc.String
 import Idris.REPL.Opts
@@ -147,6 +148,7 @@ pShowMN t env acc = case t of
 pshow : {vars : _} ->
         {auto c : Ref Ctxt Defs} ->
         {auto s : Ref Syn SyntaxInfo} ->
+        {auto u : Ref UST UState} ->
         Env Term vars -> Term vars -> Core (Doc IdrisAnn)
 pshow env tm
     = do defs <- get Ctxt
@@ -157,6 +159,7 @@ pshow env tm
 pshowNoNorm : {vars : _} ->
               {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
+              {auto u : Ref UST UState} ->
               Env Term vars -> Term vars -> Core (Doc IdrisAnn)
 pshowNoNorm env tm
     = do defs <- get Ctxt
@@ -254,6 +257,7 @@ export
 pwarningRaw : {auto c : Ref Ctxt Defs} ->
               {auto s : Ref Syn SyntaxInfo} ->
               {auto o : Ref ROpts REPLOpts} ->
+              {auto u : Ref UST UState} ->
               Warning -> Core (Doc IdrisAnn)
 pwarningRaw (ParserWarning fc msg)
     = pure $ pretty0 msg <+> line <+> !(ploc fc)
@@ -293,12 +297,14 @@ export
 pwarning : {auto c : Ref Ctxt Defs} ->
            {auto s : Ref Syn SyntaxInfo} ->
            {auto o : Ref ROpts REPLOpts} ->
+           {auto u : Ref UST UState} ->
            Warning -> Core (Doc IdrisAnn)
 pwarning wrn = pwarningRaw !(toFullNames wrn)
 
 perrorRaw : {auto c : Ref Ctxt Defs} ->
             {auto s : Ref Syn SyntaxInfo} ->
             {auto o : Ref ROpts REPLOpts} ->
+            {auto u : Ref UST UState} ->
             Error -> Core (Doc IdrisAnn)
 perrorRaw (Fatal err) = perrorRaw err
 perrorRaw (CantConvert fc gam env l r)
@@ -695,7 +701,8 @@ export
 perror : {auto c : Ref Ctxt Defs} ->
          {auto s : Ref Syn SyntaxInfo} ->
          {auto o : Ref ROpts REPLOpts} ->
-         Error -> Core (Doc IdrisAnn)
+         {auto u : Ref UST UState} ->
+         Error-> Core (Doc IdrisAnn)
 perror err = perrorRaw !(toFullNames err)
 
 ||| Check (in a whitespace-insensitive manner) that the msg is
@@ -705,6 +712,7 @@ checkError :
   {auto c : Ref Ctxt Defs} ->
   {auto s : Ref Syn SyntaxInfo} ->
   {auto o : Ref ROpts REPLOpts} ->
+  {auto u : Ref UST UState} ->
   (msg : String) -> Error -> Core Bool
 checkError msg err = do
   -- Kill the locations so that we don't get source code excerpts
@@ -725,6 +733,7 @@ export
 display : {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
           {auto o : Ref ROpts REPLOpts} ->
+          {auto u : Ref UST UState} ->
           Error -> Core (Doc IdrisAnn)
 display err = do
   pure $ annotate Error "Error:" <++> !(perror err)
@@ -733,6 +742,7 @@ export
 displayWarning : {auto c : Ref Ctxt Defs} ->
                  {auto s : Ref Syn SyntaxInfo} ->
                  {auto o : Ref ROpts REPLOpts} ->
+                 {auto u : Ref UST UState} ->
                  Warning -> Core (Doc IdrisAnn)
 displayWarning w
     = pure $ annotate Warning "Warning:" <++> !(pwarning w)

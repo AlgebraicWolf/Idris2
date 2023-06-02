@@ -12,6 +12,7 @@ import Core.Context.Log
 import Core.Directory
 import Core.Name
 import Core.TT
+import Core.UnifyState
 import Protocol.Hex
 import Libraries.Data.SortedSet
 import Libraries.Data.String.Builder
@@ -433,9 +434,10 @@ compileExpr :
   Bool ->
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> (outputDir : String) ->
   ClosedTerm -> (outfile : String) -> Core (Maybe String)
-compileExpr mkexec c s tmpDir outputDir tm outfile
+compileExpr mkexec c s _ tmpDir outputDir tm outfile
     = do let appDirRel = outfile ++ "_app" -- relative to build dir
          let appDirGen = outputDir </> appDirRel -- relative to here
          coreLift_ $ mkdirAll appDirGen
@@ -473,9 +475,10 @@ compileExpr mkexec c s tmpDir outputDir tm outfile
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> ClosedTerm -> Core ()
-executeExpr c s tmpDir tm
-    = do Just sh <- compileExpr False c s tmpDir tmpDir tm "_tmpracket"
+executeExpr c s u tmpDir tm
+    = do Just sh <- compileExpr False c s u tmpDir tmpDir tm "_tmpracket"
             | Nothing => throw (InternalError "compileExpr returned Nothing")
          coreLift_ $ system [sh]
 

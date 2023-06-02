@@ -144,6 +144,7 @@ stMain cgs opts
          let updated = foldl (\o, (s, _) => addCG (s, Other s) o) (options defs) cgs
          c <- newRef Ctxt ({ options := updated } defs)
          s <- newRef Syn initSyntax
+         u <- newRef UST initUState
          setCG {c} $ maybe Chez (Other . fst) (head' cgs)
          addPrimitives
 
@@ -171,7 +172,6 @@ stMain cgs opts
            when (not done) $ flip catch renderError $
               do when (checkVerbose opts) $ -- override Quiet if implicitly set
                      setOutput (REPL InfoLvl)
-                 u <- newRef UST initUState
                  origin <- maybe
                    (pure $ Virtual Interactive) (\fname => do
                      modIdent <- ctxtPathToNS fname
@@ -231,6 +231,7 @@ stMain cgs opts
   renderError : {auto c : Ref Ctxt Defs} ->
                 {auto s : Ref Syn SyntaxInfo} ->
                 {auto o : Ref ROpts REPLOpts} ->
+                {auto u : Ref UST UState} ->
                 Error -> Core ()
   renderError err = do
     doc <- perror err

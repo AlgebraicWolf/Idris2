@@ -211,6 +211,7 @@ addField : {auto c : Ref Ctxt Defs} ->
            {auto o : Ref ROpts REPLOpts} ->
            {auto p : Ref ParsedMods (List (FC, ModuleIdent))} ->
            {auto m : Ref MainMod (Maybe (FC, ModuleIdent))} ->
+           {auto u : Ref UST UState} ->
            DescField -> PkgDesc -> Core PkgDesc
 addField (PVersion fc n)       pkg = pure $ { version := Just n } pkg
 addField (PLangVersions fc bs) pkg = pure $ { langversion := Just bs } pkg
@@ -247,6 +248,7 @@ addField (PPostclean fc e)   pkg = pure $ { postclean := Just (fc, e) } pkg
 addFields : {auto c : Ref Ctxt Defs} ->
             {auto s : Ref Syn SyntaxInfo} ->
             {auto o : Ref ROpts REPLOpts} ->
+            {auto u : Ref UST UState} ->
             (setSrc : Bool) ->
             List DescField -> PkgDesc -> Core PkgDesc
 addFields setSrc xs desc = do
@@ -280,6 +282,7 @@ export
 parsePkgFile : {auto c : Ref Ctxt Defs} ->
                {auto s : Ref Syn SyntaxInfo} ->
                {auto o : Ref ROpts REPLOpts} ->
+               {auto u : Ref UST UState} ->
                (setSrc : Bool) -> -- parse package file as a dependency
                String -> Core PkgDesc
 parsePkgFile setSrc file = do
@@ -351,6 +354,7 @@ addDeps :
     {auto c : Ref Ctxt Defs} ->
     {auto s : Ref Syn SyntaxInfo} ->
     {auto o : Ref ROpts REPLOpts} ->
+    {auto u : Ref UST UState} ->
     PkgDesc ->
     Core ()
 addDeps pkg = do
@@ -438,6 +442,7 @@ compileMain mainn mfilename exec
 prepareCompilation : {auto c : Ref Ctxt Defs} ->
                      {auto s : Ref Syn SyntaxInfo} ->
                      {auto o : Ref ROpts REPLOpts} ->
+                     {auto u : Ref UST UState} ->
                      PkgDesc ->
                      List CLOpt ->
                      Core (List Error)
@@ -465,6 +470,7 @@ assertIdrisCompatibility pkg
 build : {auto c : Ref Ctxt Defs} ->
         {auto s : Ref Syn SyntaxInfo} ->
         {auto o : Ref ROpts REPLOpts} ->
+        {auto u : Ref UST UState} ->
         PkgDesc ->
         List CLOpt ->
         Core (List Error)
@@ -637,6 +643,7 @@ install pkg opts installSrc -- not used but might be in the future
 check : {auto c : Ref Ctxt Defs} ->
         {auto s : Ref Syn SyntaxInfo} ->
         {auto o : Ref ROpts REPLOpts} ->
+        {auto u : Ref UST UState} ->
         PkgDesc ->
         List CLOpt ->
         Core (List Error)
@@ -655,7 +662,8 @@ makeDoc : {auto c : Ref Ctxt Defs} ->
           List CLOpt ->
           Core (List Error)
 makeDoc pkg opts =
-    do [] <- prepareCompilation pkg opts
+    do u <- newRef UST initUState
+       [] <- prepareCompilation pkg opts
          | errs => pure errs
 
        defs <- get Ctxt
@@ -664,7 +672,6 @@ makeDoc pkg opts =
        let docDir = docBase </> "docs"
        Right () <- coreLift $ mkdirAll docDir
          | Left err => fileError docDir err
-       u <- newRef UST initUState
        setPPrint (MkPPOpts False True False False)
 
        [] <- concat <$> for (modules pkg) (\(mod, filename) => do
@@ -872,6 +879,7 @@ localPackageFile Nothing
 processPackage : {auto c : Ref Ctxt Defs} ->
                  {auto s : Ref Syn SyntaxInfo} ->
                  {auto o : Ref ROpts REPLOpts} ->
+                 {auto u : Ref UST UState} ->
                  List CLOpt ->
                  (PkgCommand, Maybe String) ->
                  Core ()
@@ -990,6 +998,7 @@ export
 processPackageOpts : {auto c : Ref Ctxt Defs} ->
                      {auto s : Ref Syn SyntaxInfo} ->
                      {auto o : Ref ROpts REPLOpts} ->
+                     {auto u : Ref UST UState} ->
                      List CLOpt -> Core Bool
 processPackageOpts opts
     = do (MkPFR cmds@(_::_) opts' err) <- pure $ partitionOpts opts
@@ -1007,6 +1016,7 @@ export
 findIpkg : {auto c : Ref Ctxt Defs} ->
            {auto r : Ref ROpts REPLOpts} ->
            {auto s : Ref Syn SyntaxInfo} ->
+           {auto u : Ref UST UState} ->
            Maybe String -> Core (Maybe String)
 findIpkg fname
    = do Just (dir, ipkgn, up) <- coreLift findIpkgFile

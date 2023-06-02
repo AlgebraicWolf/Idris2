@@ -5,6 +5,7 @@ import Core.Context
 import Core.Context.Log
 import Core.Env
 import Core.Normalise
+import Core.UnifyState
 import Core.Value
 import Core.TT
 
@@ -65,6 +66,7 @@ mutual
   ||| We will try to do our best...
   unelabCase : {vars : _} ->
                {auto c : Ref Ctxt Defs} ->
+               {auto u : Ref UST UState} ->
                List (Name, Nat) ->
                Env Term vars ->
                Name ->
@@ -191,6 +193,7 @@ mutual
   -- It's only intended for display
   unelabTy : {vars : _} ->
              {auto c : Ref Ctxt Defs} ->
+             {auto u : Ref UST UState} ->
              (umode : UnelabMode) ->
              (nest : List (Name, Nat)) ->
              Env Term vars -> Term vars ->
@@ -200,6 +203,7 @@ mutual
 
   unelabTy' : {vars : _} ->
               {auto c : Ref Ctxt Defs} ->
+              {auto u : Ref UST UState} ->
               (umode : UnelabMode) ->
               (nest : List (Name, Nat)) ->
               Env Term vars -> Term vars ->
@@ -229,6 +233,11 @@ mutual
   unelabTy' umode nest env (Meta fc n i args)
       = do defs <- get Ctxt
            let n' = quotedName n
+           idx <- addName n'
+           -- ?what
+           -- addGuessName fc n i
+           -- _ <- newSearch fc ?rig ?depth ?def ?env ?n ?ty
+           -- _ <- newSearch fc ?someRig
            Just ty <- lookupTyExact (Resolved i) (gamma defs)
                | Nothing => case umode of
                                  ImplicitHoles => pure (Implicit fc True, gErased fc)
@@ -320,6 +329,7 @@ mutual
 
   unelabPi : {vars : _} ->
              {auto c : Ref Ctxt Defs} ->
+             {auto u : Ref UST UState} ->
              (umode : UnelabMode) ->
              (nest : List (Name, Nat)) ->
              Env Term vars -> PiInfo (Term vars) ->
@@ -333,6 +343,7 @@ mutual
 
   unelabBinder : {vars : _} ->
                  {auto c : Ref Ctxt Defs} ->
+                 {auto u : Ref UST UState} ->
                  (umode : UnelabMode) ->
                  (nest : List (Name, Nat)) ->
                  FC -> Env Term vars -> (x : Name) ->
@@ -380,6 +391,7 @@ mutual
 export
 unelabNoSugar : {vars : _} ->
                 {auto c : Ref Ctxt Defs} ->
+                {auto u : Ref UST UState} ->
                 Env Term vars -> Term vars -> Core IRawImp
 unelabNoSugar env tm
     = do tm' <- unelabTy (NoSugar False) [] env tm
@@ -388,6 +400,7 @@ unelabNoSugar env tm
 export
 unelabUniqueBinders : {vars : _} ->
                 {auto c : Ref Ctxt Defs} ->
+                {auto u : Ref UST UState} ->
                 Env Term vars -> Term vars -> Core IRawImp
 unelabUniqueBinders env tm
     = do tm' <- unelabTy (NoSugar True) [] env tm
@@ -396,6 +409,7 @@ unelabUniqueBinders env tm
 export
 unelabNoPatvars : {vars : _} ->
                   {auto c : Ref Ctxt Defs} ->
+                  {auto u : Ref UST UState} ->
                   Env Term vars -> Term vars -> Core IRawImp
 unelabNoPatvars env tm
     = do tm' <- unelabTy ImplicitHoles [] env tm
@@ -404,6 +418,7 @@ unelabNoPatvars env tm
 export
 unelabNest : {vars : _} ->
              {auto c : Ref Ctxt Defs} ->
+             {auto u : Ref UST UState} ->
              List (Name, Nat) ->
              Env Term vars ->
              Term vars -> Core IRawImp
@@ -429,6 +444,7 @@ unelabNest nest env tm
 export
 unelab : {vars : _} ->
          {auto c : Ref Ctxt Defs} ->
+         {auto u : Ref UST UState} ->
          Env Term vars ->
          Term vars -> Core IRawImp
 unelab = unelabNest []

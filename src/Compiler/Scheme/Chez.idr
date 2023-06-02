@@ -12,6 +12,7 @@ import Core.Directory
 import Core.Name
 import Core.Options
 import Core.TT
+import Core.UnifyState
 import Protocol.Hex
 import Libraries.Utils.Path
 import Libraries.Data.SortedSet
@@ -613,9 +614,10 @@ compileExpr :
   Bool ->
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> (outputDir : String) ->
   ClosedTerm -> (outfile : String) -> Core (Maybe String)
-compileExpr makeitso c s tmpDir outputDir tm outfile
+compileExpr makeitso c s _ tmpDir outputDir tm outfile
     = do sesh <- getSession
          if not (wholeProgram sesh) && (Chez `elem` incrementalCGs sesh)
             then compileExprInc makeitso c s tmpDir outputDir tm outfile
@@ -626,9 +628,10 @@ compileExpr makeitso c s tmpDir outputDir tm outfile
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> ClosedTerm -> Core ()
-executeExpr c s tmpDir tm
-    = do Just sh <- compileExpr False c s tmpDir tmpDir tm "_tmpchez"
+executeExpr c s u tmpDir tm
+    = do Just sh <- compileExpr False c s u tmpDir tmpDir tm "_tmpchez"
             | Nothing => throw (InternalError "compileExpr returned Nothing")
          coreLift_ $ system [sh]
 

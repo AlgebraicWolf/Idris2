@@ -11,6 +11,7 @@ import Core.Directory
 import Core.Name
 import Core.Options
 import Core.TT
+import Core.UnifyState
 import Protocol.Hex
 import Libraries.Utils.Path
 import Libraries.Data.SortedSet
@@ -385,9 +386,10 @@ compileToSCM c tm outfile
 compileExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> (outputDir : String) ->
   ClosedTerm -> (outfile : String) -> Core (Maybe String)
-compileExpr c s tmpDir outputDir tm outfile
+compileExpr c s _ tmpDir outputDir tm outfile
     = do let srcPath = tmpDir </> outfile <.> "scm"
          let execPath = outputDir </> outfile
          libsname <- compileToSCM c tm srcPath
@@ -408,9 +410,10 @@ compileExpr c s tmpDir outputDir tm outfile
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> ClosedTerm -> Core ()
-executeExpr c s tmpDir tm
-    = do Just sh <- compileExpr c s tmpDir tmpDir tm "_tmpgambit"
+executeExpr c s u tmpDir tm
+    = do Just sh <- compileExpr c s u tmpDir tmpDir tm "_tmpgambit"
            | Nothing => throw (InternalError "compileExpr returned Nothing")
          coreLift_ $ system [sh] -- TODO: on windows, should add exe extension
          pure ()

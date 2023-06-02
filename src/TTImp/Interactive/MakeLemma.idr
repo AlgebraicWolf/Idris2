@@ -5,6 +5,7 @@ import Core.Env
 import Core.Metadata
 import Core.Normalise
 import Core.TT
+import Core.UnifyState
 
 import Idris.Syntax
 
@@ -44,6 +45,7 @@ bindableArg p _ = False
 getArgs : {vars : _} ->
           {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
+          {auto u : Ref UST UState} ->
           Env Term vars -> Nat -> Term vars ->
           Core (List (Name, Maybe Name, PiInfo RawImp, RigCount, RawImp), RawImp)
 getArgs {vars} env (S k) (Bind _ x b@(Pi _ c _ ty) sc)
@@ -88,6 +90,7 @@ export
 makeLemma : {auto m : Ref MD Metadata} ->
             {auto c : Ref Ctxt Defs} ->
             {auto s : Ref Syn SyntaxInfo} ->
+            {auto u : Ref UST UState} ->
             FC -> Name -> Nat -> ClosedTerm ->
             Core (RawImp, RawImp)
 makeLemma loc n nlocs ty

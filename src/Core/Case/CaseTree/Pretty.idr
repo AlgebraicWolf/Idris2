@@ -4,6 +4,7 @@ import Core.Context
 import Core.Env
 import Core.TT
 import Core.Case.CaseTree
+import Core.UnifyState
 import Idris.Syntax
 import Idris.Pretty
 import Idris.Resugar
@@ -63,10 +64,12 @@ namespace Resugared
   prettyTree : {vars : _} ->
     {auto c : Ref Ctxt Defs} ->
     {auto s : Ref Syn SyntaxInfo} ->
+    {auto u : Ref UST UState} ->
     Env Term vars -> CaseTree vars -> Core (Doc IdrisSyntax)
   prettyAlt : {vars : _} ->
     {auto c : Ref Ctxt Defs} ->
     {auto s : Ref Syn SyntaxInfo} ->
+    {auto u : Ref UST UState} ->
     Env Term vars -> CaseAlt vars -> Core (Doc IdrisSyntax)
 
   prettyTree env (Case {name} idx prf ty alts) = do

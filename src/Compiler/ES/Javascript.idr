@@ -8,6 +8,7 @@ import Compiler.Common
 import Core.Context
 import Core.TT
 import Core.Options
+import Core.UnifyState
 import Libraries.Utils.Path
 
 import Idris.Syntax
@@ -20,8 +21,9 @@ import Data.String
 compileToJS :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   ClosedTerm -> Core String
-compileToJS c s tm = compileToES c s Javascript tm ["browser", "javascript"]
+compileToJS c s u tm = compileToES c s u Javascript tm ["browser", "javascript"]
 
 htmlHeader : String
 htmlHeader = """
@@ -52,13 +54,14 @@ addHeaderAndFooter outfile es =
 compileExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) ->
   (outputDir : String) ->
   ClosedTerm ->
   (outfile : String) ->
   Core (Maybe String)
-compileExpr c s tmpDir outputDir tm outfile =
-  do es <- compileToJS c s tm
+compileExpr c s u tmpDir outputDir tm outfile =
+  do es <- compileToJS c s u tm
      let res = addHeaderAndFooter outfile es
      let out = outputDir </> outfile
      Core.writeFile out res
@@ -68,8 +71,9 @@ compileExpr c s tmpDir outputDir tm outfile =
 executeExpr :
   Ref Ctxt Defs ->
   Ref Syn SyntaxInfo ->
+  Ref UST UState ->
   (tmpDir : String) -> ClosedTerm -> Core ()
-executeExpr c s tmpDir tm =
+executeExpr c s u tmpDir tm =
   throw $ InternalError "Javascript backend is only able to compile, use Node instead"
 
 ||| Codegen wrapper for Javascript implementation.
