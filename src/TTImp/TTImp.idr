@@ -222,6 +222,7 @@ mutual
        Unsafe : FnOpt' nm
        Inline : FnOpt' nm
        NoInline : FnOpt' nm
+       Memoise : FnOpt' nm
        ||| Mark a function as deprecated.
        Deprecate : FnOpt' nm
        TCInline : FnOpt' nm
@@ -253,6 +254,7 @@ mutual
     show Unsafe = "%unsafe"
     show Inline = "%inline"
     show NoInline = "%noinline"
+    show Memoise = "%memoise"
     show Deprecate = "%deprecate"
     show TCInline = "%tcinline"
     show (Hint t) = "%hint " ++ show t
@@ -271,6 +273,7 @@ mutual
   Eq FnOpt where
     Inline == Inline = True
     NoInline == NoInline = True
+    Memoise == Memoise = True
     Deprecate == Deprecate = True
     TCInline == TCInline = True
     (Hint x) == (Hint y) = x == y
