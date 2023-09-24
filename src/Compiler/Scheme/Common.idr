@@ -659,7 +659,9 @@ parameters (constants : SortedSet Name,
 
   schDef n (MkNmFun args exp)
      = pure $ "(define " ++ schName !(getFullName n) ++ " (lambda (" ++ schArglist args ++ ") "
-                      ++ !(schExp 0 exp) ++ "))\n"
+                      ++ "(begin (blodwen-callStackPush \"" ++ (schName !(getFullName n)) ++ "\")"
+                      ++ "(let ((fn-res " ++ !(schExp 0 exp) ++ "))"
+                      ++ "(begin (blodwen-callStackPop) fn-res)))))"
   schDef n (MkNmError exp)
      = pure $ "(define (" ++ schName !(getFullName n) ++ " . any-args) " ++ !(schExp 0 exp) ++ ")\n"
   schDef n (MkNmForeign _ _ _) = pure "" -- compiled by specific back end

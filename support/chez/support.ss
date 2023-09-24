@@ -40,6 +40,76 @@
       (if (> b 0) (+ r b) (- r b))
       r)))
 
+(define blodwen-callStack
+  `())
+
+(define blodwen-callStackMutex
+  (make-mutex))
+
+(define blodwen-profileCounts
+  (make-hashtable equal-hash equal?))
+
+(define (blodwen-callStackPush fnNm)
+  (with-mutex blodwen-callStackMutex
+              (set! blodwen-callStack (cons fnNm blodwen-callStack))))
+
+(define (blodwen-callStackPop)
+  (with-mutex blodwen-callStackMutex
+              (set! blodwen-callStack (cdr blodwen-callStack))))
+
+(define (blodwen-profileInc)
+  (with-mutex blodwen-callStackMutex
+              (let ((prev (hashtable-ref blodwen-profileCounts blodwen-callStack 0)))
+                  (hashtable-set! blodwen-profileCounts blodwen-callStack (+ prev 1)))))
+
+(define blodwen-isRunning
+  (make-parameter #t))
+
+(define (blodwen-profileSample)
+  (begin
+    (blodwen-profileInc)
+    (sleep (make-time `time-duration 1000000 0))
+    (if (blodwen-isRunning)
+      (blodwen-profileSample)
+      `())))
+(define (blodwen-hashtable-map ht f)
+  (let ((keys (hashtable-keys ht)))
+    (vector-map f keys (vector-map (lambda (x) (hashtable-ref ht x 0)) keys ))))
+
+(define (blodwen-string-join strs delim)
+  (if (null? strs)
+    ""
+    (string-append (car strs)
+                   (if (null? (cdr strs))
+                       ""
+                       delim)
+                   (blodwen-string-join (cdr strs) delim))))
+
+
+(define (blodwen-display-with-delim strs delim output-port)
+  (cond
+    ((null? strs) `())
+    ((null? (cdr strs)) (display (car strs) output-port))
+    (else
+      (display (car strs) output-port)
+      (display delim output-port)
+      (blodwen-display-with-delim (cdr strs) delim output-port))))
+
+(define (blodwen-profile-strings output-port)
+  (blodwen-hashtable-map blodwen-profileCounts
+                         (lambda (trace counts)
+                           ; (string-append (blodwen-string-join (reverse trace) ";") " " (number->string counts)))))
+                           (begin
+                             (blodwen-display-with-delim (reverse trace) ";" output-port)
+                             (display " " output-port)
+                             (display (number->string counts) output-port)
+                             (newline output-port)))))
+
+(define (blodwen-profile-dump)
+  (delete-file "profile.folded")
+  (call-with-output-file "profile.folded"
+                         blodwen-profile-strings))
+
 (define bu+ (lambda (x y bits) (blodwen-toUnsignedInt (+ x y) bits)))
 (define bu- (lambda (x y bits) (blodwen-toUnsignedInt (- x y) bits)))
 (define bu* (lambda (x y bits) (blodwen-toUnsignedInt (* x y) bits)))
