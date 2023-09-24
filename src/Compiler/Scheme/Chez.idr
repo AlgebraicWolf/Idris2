@@ -106,13 +106,16 @@ schHeader chez libs whole
                   "(source-directories (cons (getenv \"IDRIS2_INC_SRC\") (source-directories)))"
      }
 
+
     """
 
 schFooter : Bool -> Bool -> Builder
 schFooter prof whole = fromString """
 
-    (collect 4)
-    (blodwen-run-finalisers)
+    (blodwen-isRunning #f)
+    ; (collect 4)
+    ; (blodwen-run-finalisers)
+    (blodwen-profile-dump)
     \{ ifThenElse prof "(profile-dump-html)" "" }
     \{ ifThenElse whole ")" "" }
   """
@@ -472,6 +475,7 @@ compileToSS c prof appdir tm outfile
          (sortedDefs, constants) <- sortDefs ndefs
          compdefs <- logTime 3 "Print as scheme" $ traverse (getScheme constants (chezExtPrim constants) chezString) sortedDefs
          let code = concat (map snd fgndefs) ++ concat compdefs
+         let profile_sample = "(fork-thread blodwen-profileSample)"
          main <- schExp constants (chezExtPrim constants) chezString 0 ctm
          support <- readDataFile "chez/support.ss"
          extraRuntime <- getExtraRuntime ds
@@ -481,6 +485,7 @@ compileToSS c prof appdir tm outfile
                    , fromString extraRuntime
                    , code
                    , "(collect-request-handler (lambda () (collect) (blodwen-run-finalisers)))\n"
+                   , "(fork-thread blodwen-profileSample)"
                    , main
                    , schFooter prof True
                    ]
