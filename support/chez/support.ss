@@ -55,24 +55,18 @@
 (define blodwen-callStack
   `())
 
-(define blodwen-callStackMutex
-  (make-mutex))
-
 (define blodwen-profileCounts
   (make-hashtable equal-hash equal?))
 
 (define (blodwen-callStackPush fnNm)
-  (with-mutex blodwen-callStackMutex
-              (set! blodwen-callStack (cons fnNm blodwen-callStack))))
+  (set! blodwen-callStack (cons fnNm blodwen-callStack)))
 
 (define (blodwen-callStackPop)
-  (with-mutex blodwen-callStackMutex
-              (set! blodwen-callStack (cdr blodwen-callStack))))
+  (set! blodwen-callStack (cdr blodwen-callStack)))
 
 (define (blodwen-profileInc)
-  (with-mutex blodwen-callStackMutex
-              (let ((prev (hashtable-ref blodwen-profileCounts blodwen-callStack 0)))
-                  (hashtable-set! blodwen-profileCounts blodwen-callStack (+ prev 1)))))
+  (let ((prev (hashtable-ref blodwen-profileCounts blodwen-callStack 0)))
+      (hashtable-set! blodwen-profileCounts blodwen-callStack (+ prev 1))))
 
 (define blodwen-isRunning
   (make-parameter #t))
