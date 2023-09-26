@@ -46,6 +46,11 @@
 (define blodwen-profileCounts
   (make-hashtable equal-hash equal?))
 
+(define (blodwen-deduplicateList l)
+  (cond ((null? l) `())
+        ((member (car l) (cdr l)) (blodwen-deduplicateList (cdr l)))
+        (else (cons (car l) (blodwen-deduplicateList (cdr l))))))
+
 (define (blodwen-callStackPush fnNm)
   (set! blodwen-callStack (cons fnNm blodwen-callStack)))
 
@@ -54,7 +59,7 @@
 
 (define (blodwen-profileInc)
   (let ((prev (hashtable-ref blodwen-profileCounts blodwen-callStack 0)))
-      (hashtable-set! blodwen-profileCounts blodwen-callStack (+ prev 1))))
+      (hashtable-set! blodwen-profileCounts (blodwen-deduplicateList blodwen-callStack) (+ prev 1))))
 
 (define blodwen-isRunning
   (make-parameter #t))
