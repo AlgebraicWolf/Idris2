@@ -1,3 +1,9 @@
+LOG package.depends:50: adding new dependency: foo (<= 0.2.0)
+LOG package.depends:50: adding new dependency: baz (>= 0.2.0)
+LOG package.depends:50: adding new dependency: quux (any)
+LOG package.depends:50: adding new dependency: bar (>= 0.1.0)
+LOG package.depends:50: adding new dependency: prz (> 0.1.0)
+LOG package.depends:50: adding new dependency: baz (< 0.1.0)
 Uncaught error: EmptyFC:Failed to resolve the dependencies for test:
   foo-0.2.0; baz-0.3.0; required quux any but no matching version is installed
   foo-0.2.0; baz-0.2.0; bar-0.1.1; required baz < 0.2.0 but assigned version 0.2.0 which is out of bounds
