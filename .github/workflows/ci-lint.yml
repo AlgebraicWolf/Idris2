@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Try pulling ubuntu
-        run: docker pull ubuntu:20.04
+        run: docker pull tarantool:latest
       - name: Lint the sources
         run: python3 lint/lint.py
         shell: bash
