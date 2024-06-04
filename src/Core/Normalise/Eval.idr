@@ -521,16 +521,16 @@ parameters (defs : Defs, topopts : EvalOpts)
                                     Just (S k) =>
                                         do let opts' = { fuel := Just k } opts
                                            evalWithOpts defs opts' env newLoc res stk'
-             else do -- logC "eval.def.stuck" 50 $ do
-                     --   def <- toFullNames def
-                     --   pure $ unlines [ "Refusing to reduce \{show def}:"
-                     --                  , "  holesOnly   : \{show $ holesOnly opts}"
-                     --                  , "  argHolesOnly: \{show $ argHolesOnly opts}"
-                     --                  , "  tcInline    : \{show $ tcInline opts}"
-                     --                  , "  meta        : \{show meta}"
-                     --                  , "  rigd        : \{show rigd}"
-                     --                  ]
-                     pure def
+             else do  logC "eval.def.stuck" 50 $ do
+                        def <- toFullNames def
+                        pure $ unlines [ "Refusing to reduce \{show def}:"
+                                       , "  holesOnly   : \{show $ holesOnly opts}"
+                                       , "  argHolesOnly: \{show $ argHolesOnly opts}"
+                                       , "  tcInline    : \{show $ tcInline opts}"
+                                       , "  meta        : \{show meta}"
+                                       , "  rigd        : \{show rigd}"
+                                       ]
+                      pure def
     evalDef env opts meta fc rigd (Builtin op) flags stk def
         = evalOp (getOp op) stk def
     -- All other cases, use the default value, which is already applied to
