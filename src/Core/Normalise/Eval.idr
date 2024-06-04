@@ -309,9 +309,9 @@ parameters (defs : Defs, topopts : EvalOpts)
                                         pure def -- name is past reduction limit
                    nf <- evalDef env opts' meta fc
                            (multiplicity res) (definition res) (flags res) stk def
-                   -- logC "eval.ref" 50 $ do n' <- toFullNames n
-                   --                         nf <- toFullNames nf
-                   --                         pure "Reduced \{show n'} to \{show nf}"
+                   logC "eval.ref" 50 $ do n' <- toFullNames n
+                                           nf <- toFullNames nf
+                                           pure "Reduced \{show n'} to \{show nf}"
                    pure nf
                 else pure def
 
