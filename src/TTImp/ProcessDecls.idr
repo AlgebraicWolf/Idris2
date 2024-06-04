@@ -71,7 +71,7 @@ processFailing eopts nest env fc mmsg decls
                    let (e :: es) = errs
                      | [] => do -- We better have unsolved holes
                                 -- checkUserHoles True -- do we need this one too?
-
+                                checkUserHoles True
                                  -- should we only look at the ones introduced in the block?
                                 Nothing <- checkDelayedHoles
                                   | Just err => throw err

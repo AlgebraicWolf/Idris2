@@ -290,6 +290,8 @@ parameters (defs : Defs, topopts : EvalOpts)
                   | Nothing => do logC "eval.stuck.outofscope" 5 $ do n' <- toFullNames n
                                                                       pure $ "Stuck function: " ++ show n'
                                   pure def
+
+             logC "eval.ref" 50 $ pure $ "Looked up \{show n}: " ++ (show $ fullname res)
              let redok1 = evalAll topopts
              let redok2 = reducibleInAny (currentNS defs :: nestedNS defs)
                                          (fullname res)
@@ -309,9 +311,10 @@ parameters (defs : Defs, topopts : EvalOpts)
                                         pure def -- name is past reduction limit
                    nf <- evalDef env opts' meta fc
                            (multiplicity res) (definition res) (flags res) stk def
+                   let reducedBy : String = if redok1 then "evalAll" else "reducibleInAny"
                    logC "eval.ref" 50 $ do n' <- toFullNames n
                                            nf <- toFullNames nf
-                                           pure "Reduced \{show n'} to \{show nf}"
+                                           pure "Reduced \{show n'} to \{show nf} using \{reducedBy}"
                    pure nf
                 else pure def
 
