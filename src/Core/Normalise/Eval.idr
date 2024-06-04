@@ -522,7 +522,7 @@ parameters (defs : Defs, topopts : EvalOpts)
                                         do let opts' = { fuel := Just k } opts
                                            evalWithOpts defs opts' env newLoc res stk'
              else do  logC "eval.def.stuck" 50 $ do
-                        def <- toFullNames def
+                        -- def <- toFullNames def
                         pure $ unlines [ "Refusing to reduce \{show def}:"
                                        , "  holesOnly   : \{show $ holesOnly opts}"
                                        , "  argHolesOnly: \{show $ argHolesOnly opts}"
