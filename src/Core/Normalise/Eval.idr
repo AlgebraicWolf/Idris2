@@ -505,6 +505,7 @@ parameters (defs : Defs, topopts : EvalOpts)
              || (not (holesOnly opts || argHolesOnly opts || tcInline opts))
              || (meta && not (isErased rigd))
              || (meta && holesOnly opts)
+             || (meta && argHolesOnly opts)
              || (tcInline opts && elem TCInline flags)
              then case argsFromStack args stk of
                        Nothing => do logC "eval.def.underapplied" 50 $ do
