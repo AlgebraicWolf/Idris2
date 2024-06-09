@@ -88,7 +88,7 @@ processFailing eopts nest env fc mmsg decls
                              pure (FailingWrongError fc msg (e ::: es)))
                (\err => do let Just msg = mmsg
                                  | _ => pure Nothing
-                           log "elab.failing" 10 $ "Failing block based on \{show msg} failed with \{show err}"
+                           log "elab.failing" 10 $ "Failing block based on \{show msg} failed with an err: \{show err}"
                            test <- checkError msg err
                            pure $ do -- Unless the error is the expected one
                                      guard (not test)
