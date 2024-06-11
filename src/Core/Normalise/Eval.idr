@@ -316,7 +316,16 @@ parameters (defs : Defs, topopts : EvalOpts)
                                            nf <- toFullNames nf
                                            pure "Reduced \{show n'} to \{show nf} using \{reducedBy}"
                    pure nf
-                else pure def
+                else do
+                  logC "eval.def.stuck" 50 $ do
+                    -- def <- toFullNames def
+                    pure $ unlines [ "Won't reduce \{show def}:"
+                                   , "  holesOnly   : \{show $ holesOnly topopts}"
+                                   , "  argHolesOnly: \{show $ argHolesOnly topopts}"
+                                   , "  tcInline    : \{show $ tcInline topopts}"
+                                   , "  meta        : \{show meta}"
+                                   ]
+                  pure def
 
     getCaseBound : List (Closure free) ->
                    (args : List Name) ->
