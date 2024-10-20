@@ -553,6 +553,12 @@ preOptions (Total :: opts)
 preOptions (NoCSE :: opts)
     = do updateSession ({ noCSE := True })
          preOptions opts
+preOptions (SamplingProfile :: opts)
+    = do updateSession ({ samplingProfile := True })
+         preOptions opts
+preOptions (SamplingProfilerFrequency freq :: opts)
+    = do updateSession ({ samplingProfilerFreq := freq })
+         preOptions opts
 preOptions (_ :: opts) = preOptions opts
 
 -- Options to be processed after type checking. Returns whether execution

@@ -159,6 +159,8 @@ record Session where
   dumpanf : Maybe String -- file to output ANF definitions
   dumpvmcode : Maybe String -- file to output VM code definitions
   profile : Bool -- generate profiling information, if supported
+  samplingProfile : Bool -- generate sampling profiler instrumentation
+  samplingProfilerFreq : Nat -- frequency for the sampling profiler
   logErrorCount : Nat -- when parsing alternatives fails, how many errors
                       -- should be shown.
   noCSE : Bool -- disable common subexpression elimination
@@ -241,7 +243,7 @@ export
 defaultSession : Session
 defaultSession = MkSessionOpts False CoveringOnly False False Chez [] 1000 False False
                                defaultLogLevel Nothing False Nothing Nothing
-                               Nothing Nothing False 1 False False True
+                               Nothing Nothing False False 1000 1 False False True
                                False [] False False
 
 export
