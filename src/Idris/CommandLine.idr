@@ -174,7 +174,10 @@ data CLOpt
    ||| Turn on %default total globally
   Total |
    ||| Disable common subexpression elimination
-  NoCSE
+  NoCSE |
+   ||| Enable sampling profiling instrumentation
+  SamplingProfile (Maybe String)
+
 
 ||| Extract the host and port to bind the IDE socket to
 export
@@ -259,6 +262,8 @@ options = [MkOpt ["--check", "-c"] [] [CheckOnly]
               (Just "Generate profile data when compiling, if supported"),
            MkOpt ["--no-cse"] [] [NoCSE]
               (Just "Disable common subexpression elimination"),
+           MkOpt ["--sampling-profile"] [Optional "freq"] (\freq => [SamplingProfile freq])
+              (Just "Add sampling profiler instrumentation"),
 
            optSeparator,
            MkOpt ["--total"] [] [Total]
