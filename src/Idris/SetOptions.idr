@@ -541,6 +541,16 @@ preOptions (Total :: opts)
 preOptions (NoCSE :: opts)
     = do updateSession ({ noCSE := True })
          preOptions opts
+preOptions (SamplingProfile freq :: opts)
+    = do freq <- case freq of
+                      Just freq =>
+                        case parsePositive freq of
+                             Nothing =>
+                               throw $ InternalError "expected non-negative profiling frequency, found \{freq}"
+                             Just freq => pure freq
+                      Nothing => pure 4000
+         updateSession ({ samplingProfile := Just freq })
+         preOptions opts
 preOptions (_ :: opts) = preOptions opts
 
 -- Options to be processed after type checking. Returns whether execution
