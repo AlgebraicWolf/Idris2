@@ -12,6 +12,7 @@ import Libraries.Data.String.Builder
 import Libraries.Utils.Path
 
 import Data.Maybe
+import Data.Nat
 import Data.String
 import Data.SortedSet
 
@@ -397,10 +398,17 @@ compileToRKT c appdir tm outfile
          support <- readDataFile "racket/support.rkt"
          extraRuntime <- getExtraRuntime ds
          let prof = profile !getSession
+         let statProf = samplingProfile !getSession
+         let freq = samplingProfilerFreq !getSession
          let runmain
                 = if prof
                      then "(profile (void " ++ main ++ ") #:order 'self)\n"
-                     else "(void " ++ main ++ ")\n"
+                     else if statProf
+                            then let delay = 1000000000 `div` freq
+                                     in "(blodwen-with-profile "
+                                          ++ singleton (show delay) ++ " "
+                                          ++ "(void " ++ main ++ "))\n"
+                            else "(void " ++ main ++ ")\n"
          let scm = schHeader prof (concat (map fst fgndefs)) ++
                    fromString support ++ fromString extraRuntime ++ code ++
                    runmain ++ schFooter

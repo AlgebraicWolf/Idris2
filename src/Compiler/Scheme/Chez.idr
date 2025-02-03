@@ -12,6 +12,7 @@ import Libraries.Utils.Path
 import Libraries.Data.String.Builder
 
 import Data.Maybe
+import Data.Nat
 import Data.SortedSet
 import Data.String
 
@@ -501,6 +502,12 @@ compileToSS c prof appdir tm outfile
          compdefs <- logTime 3 "Print as scheme" $ traverse (getScheme constants (chezExtPrim constants schLazy) chezString schLazy) sortedDefs
          let code = concat (map snd fgndefs) ++ concat compdefs
          main <- schExp constants (chezExtPrim constants schLazy) chezString schLazy 0 ctm
+         let main = if defs.options.session.samplingProfile
+                       then let delay = 1000000000 `div` defs.options.session.samplingProfilerFreq
+                                in "(blodwen-with-profile "
+                                    ++ singleton (show delay) ++ " "
+                                    ++ main ++ ")"
+                       else main
          support <- readDataFile "chez/support.ss"
          extraRuntime <- getExtraRuntime ds
          let scm = concat $ the (List _)
