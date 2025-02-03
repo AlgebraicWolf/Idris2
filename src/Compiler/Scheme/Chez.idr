@@ -509,6 +509,12 @@ compileToSS c prof appdir tm outfile
          compdefs <- logTime 3 "Print as scheme" $ traverse (getScheme constants (chezExtPrim constants schLazy) chezString schLazy) sortedDefs
          let code = concat (map snd fgndefs) ++ concat compdefs
          main <- schExp constants (chezExtPrim constants schLazy) chezString schLazy 0 ctm
+         let main = case defs.options.session.samplingProfile of
+                      Just freq => let delay = 1000000000 `div` freq
+                                       in "(blodwen-with-profile "
+                                       ++ singleton (show delay) ++ " "
+                                       ++ main ++ ")"
+                      Nothing => main
          support <- readDataFile "chez/support.ss"
          extraRuntime <- getExtraRuntime ds
          let scm = concat $ the (List _)

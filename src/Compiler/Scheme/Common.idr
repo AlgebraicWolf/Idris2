@@ -10,6 +10,7 @@ import Compiler.CompileExpr
 
 import Core.Context
 import Core.Name
+import Core.Options
 import Core.TT
 
 import Libraries.Data.SortedSet
@@ -683,8 +684,21 @@ parameters (constants : SortedSet Name)
 
 
   schDef n (MkNmFun args exp)
-     = pure $ "(define " ++ schName !(getFullName n) ++ " (lambda (" ++ schArglist args ++ ") "
-                      ++ !(schExp 0 exp) ++ "))\n"
+     = do
+        defs <- get Ctxt
+        name <- getFullName n
+        let body = " (lambda (" ++ schArglist args ++ ") (blodwen-cost-centre \"" ++ singleton (escapeName $ show name) ++ "\" " ++ !(schExp 0 exp) ++ "))"
+        pure $ if isJust defs.options.session.samplingProfile
+          then "(define " ++ schName name ++ body ++ ")\n"
+          else "(define " ++ schName name ++ body ++ ")\n"
+    where
+      escapeName' : List Char -> List Char
+      escapeName' [] = []
+      escapeName' ('\\'::xs) = '\\' :: '\\' :: escapeName' xs
+      escapeName' (x::xs) = x :: escapeName' xs
+
+      escapeName : String -> String
+      escapeName = fastPack . escapeName' . fastUnpack
   schDef n (MkNmError exp)
      = pure $ "(define (" ++ schName !(getFullName n) ++ " . any-args) " ++ !(schExp 0 exp) ++ ")\n"
   schDef n (MkNmForeign _ _ _) = pure "" -- compiled by specific back end
