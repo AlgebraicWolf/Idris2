@@ -630,3 +630,18 @@
   (symbol->string sym))
 
 (define (blodwen-id x) x)
+
+;; For profiling
+; So far, this is a noop scaffolding
+
+(define-syntax blodwen-cost-centre
+  (syntax-rules ()
+    [(_ name body)
+     (body)]))
+
+(define-syntax blodwen-function
+  (syntax-rules ()
+    [(_ name head body)
+     (define head
+       (blodwen-cost-centre name body))]))
+
