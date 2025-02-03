@@ -612,3 +612,53 @@
   (symbol->string sym))
 
 (define (blodwen-id x) x)
+
+;; For profiling
+
+(define-syntax blodwen-cost-centre
+  (syntax-rules ()
+    [(_ name body)
+     body]))
+
+(define blodwen-running (make-semaphore))
+
+(define (blodwen-profiler sleep-duration-ns profiled-thread-desc)
+  (define (blodwen-current-call-stack)
+    '())
+  (define profile-filename "profile.folded")
+  (define (display-trace trace output-port)
+    ; Omit the empty stack traces
+    (if (pair? trace)
+      (begin
+        (foldr (lambda (fn _)
+                      (display fn output-port)
+                      (display ";" output-port))
+                    '()
+                    trace)
+        (display " 1\n" output-port)) '()))
+  (define (timed thunk)
+    (let ((start (current-time)))
+      (thunk)
+      (time-difference (current-time) start)))
+  (define sleep-duration
+    (make-time 'time-duration sleep-duration-ns 0))
+  (define (sampling-loop port)
+    (let ((write-duration
+            (timed
+              (lambda () (display-trace (blodwen-current-call-stack) port)))))
+      (if (semaphore-try-wait? blodwen-running)
+        '()
+        (sampling-loop port))))
+  (lambda ()
+    (call-with-output-file #:exists 'truncate
+                           profile-filename
+                           sampling-loop)))
+
+(define-syntax blodwen-with-profile
+  (syntax-rules ()
+    [(_ sleep-duration body)
+     (begin
+       (let ((profiler-thread (thread (blodwen-profiler sleep-duration (current-thread)))))
+         body
+         (semaphore-post blodwen-running)
+         (thread-wait profiler-thread)))]))
