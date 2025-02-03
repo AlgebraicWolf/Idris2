@@ -404,10 +404,16 @@ compileToRKT c appdir tm outfile
          support <- readDataFile "racket/support.rkt"
          extraRuntime <- getExtraRuntime ds
          let prof = profile !getSession
+         let statProf = samplingProfile !getSession
          let runmain
                 = if prof
                      then "(profile (void " ++ main ++ ") #:order 'self)\n"
-                     else "(void " ++ main ++ ")\n"
+                     else case statProf of
+                            Nothing => "(void " ++ main ++ ")\n"
+                            Just freq => let delay = 1000000000 `div` freq
+                                             in "(blodwen-with-profile "
+                                                 ++ singleton (show delay) ++ " "
+                                                 ++ "(void " ++ main ++ "))\n"
          let scm = schHeader prof (concat (map fst fgndefs)) ++
                    fromString support ++ fromString extraRuntime ++ code ++
                    runmain ++ schFooter
