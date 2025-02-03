@@ -507,6 +507,9 @@ compileToSS c prof appdir tm outfile
          compdefs <- logTime 3 "Print as scheme" $ traverse (getScheme constants (chezExtPrim constants schLazy) chezString schLazy) sortedDefs
          let code = concat (map snd fgndefs) ++ concat compdefs
          main <- schExp constants (chezExtPrim constants schLazy) chezString schLazy 0 ctm
+         let main = if isJust defs.options.session.samplingProfile
+                      then "(blodwen-keep-stack-trace) " ++ main
+                      else main
          support <- readDataFile "chez/support.ss"
          extraRuntime <- getExtraRuntime ds
          let scm = concat $ the (List _)

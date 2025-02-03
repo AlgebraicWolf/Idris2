@@ -630,3 +630,32 @@
   (symbol->string sym))
 
 (define (blodwen-id x) x)
+
+;; For profiling
+; So far, this is a noop scaffolding
+
+(define blodwen-call-stack '())
+
+(define-syntax blodwen-cost-centre
+  (syntax-rules ()
+    [(_ name body)
+     (body)]))
+
+(define-syntax blodwen-function
+  (syntax-rules ()
+    [(_ name head body)
+     (define head
+       (blodwen-cost-centre name body))]))
+
+; In Chez, there is no way to inspect the current continuation
+; from another thread. To record call stacks, we need
+; a routine that will keep globally accessible stack trace.
+(define (blodwen-keep-stack-trace)
+  ; The number of ticks specifies how often should the
+  ; globally-accessible stack trace be updated.
+  (define ticks 10000)
+  (timer-interrupt-handler
+    (lambda ()
+      (set! blodwen-call-stack (blodwen-current-call-stack))
+      (set-timer ticks)))
+  (set-timer ticks))
