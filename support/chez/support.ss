@@ -632,12 +632,20 @@
 (define (blodwen-id x) x)
 
 ;; For profiling
-; So far, this is a noop scaffolding
+; To avoid losing information about functions in stack trace when
+; there are calls in tail position, we make sure to create a new
+; continuation frame for every cost centre.
+(define (blodwen-current-call-stack)
+  (continuation-marks->list (current-continuation-marks) 'blodwen-call-stack))
 
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     (body)]))
+     (values
+       (with-continuation-mark
+         'blodwen-call-stack
+         name
+         body))]))
 
 (define-syntax blodwen-function
   (syntax-rules ()
