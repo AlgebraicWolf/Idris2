@@ -685,20 +685,23 @@
 (define (blodwen-id x) x)
 
 ;; For profiling
-; So far, this is a noop scaffolding
 
 (define blodwen-call-stack '())
 
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     body]))
+     (with-continuation-mark
+       'blodwen-call-stack
+       name
+       (values
+         body))]))
 
 ; To avoid losing information about functions in stack trace when
 ; there are calls in tail position, we make sure to create a new
 ; continuation frame for every cost centre.
 (define (blodwen-current-call-stack)
-  '())
+  (continuation-marks->list (current-continuation-marks) 'blodwen-call-stack))
 
 ; In Chez, there is no way to inspect the current continuation
 ; from another thread. To record call stacks, we need
