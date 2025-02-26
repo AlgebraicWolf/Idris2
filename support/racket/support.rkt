@@ -615,16 +615,24 @@
 
 ;; For profiling
 
+(define (blodwen-call-stack mark-set)
+  (continuation-mark-set-first
+    mark-set
+    'blodwen-call-stack))
+
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     body]))
+     (with-continuation-mark
+       'blodwen-call-stack
+       (cons name (blodwen-call-stack (current-continuation-marks)))
+       body)]))
 
 (define blodwen-running (make-semaphore))
 
 (define (blodwen-profiler sleep-duration-ns profiled-thread-desc)
   (define (blodwen-current-call-stack)
-    '())
+    (blodwen-call-stack (continuation-marks profiled-thread-desc)))
   (define profile-filename "profile.folded")
   (define (display-trace trace output-port)
     ; Omit the empty stack traces
@@ -659,6 +667,9 @@
     [(_ sleep-duration body)
      (begin
        (let ((profiler-thread (thread (blodwen-profiler sleep-duration (current-thread)))))
-         body
+         (with-continuation-mark
+           'blodwen-call-stack
+           '()
+           body)
          (semaphore-post blodwen-running)
          (thread-wait profiler-thread)))]))
