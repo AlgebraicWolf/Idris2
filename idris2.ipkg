@@ -10,7 +10,7 @@ sourcedir = "src"
 -- Set if you want the executable to generate profiling data
 -- (Currently supported by Racket and Chez back ends, others ignore it)
 -- opts = "--profile"
-
+opts = "--sampling-profile 1000"
 -- Set if you want incremental builds. This is good for development, since
 -- small changes compile faster, but bad for deployment since the resulting
 -- executable runs at around half the speed.
