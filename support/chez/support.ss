@@ -687,7 +687,7 @@
 ;; For profiling
 ; So far, this is a noop scaffolding
 
-(define blodwen-call-stack '())
+(define blodwen-call-stack (lambda () (values #f blodwen-call-stack)))
 
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
@@ -701,7 +701,7 @@
 ; there are calls in tail position, we make sure to create a new
 ; continuation frame for every cost centre.
 (define (blodwen-current-call-stack)
-  (continuation-marks->list (current-continuation-marks) 'blodwen-call-stack))
+  (continuation-marks->iterator (current-continuation-marks) '#(blodwen-call-stack)))
 
 ; In Chez, there is no way to inspect the current continuation
 ; from another thread. To record call stacks, we need
@@ -726,15 +726,15 @@
 (define (blodwen-profiler sleep-duration-ns)
   (define profile-filename "profile.folded")
   (define (display-trace trace output-port)
-    ; Here, we omit the empty stack traces
-    (if (pair? trace)
-      (begin
-        (fold-right (lambda (fn _)
-                      (display fn output-port)
-                      (display ";" output-port))
-                    '()
-                    trace)
-        (display " 1\n" output-port))))
+      (if (let loop ([iter trace] [ret #f])
+            (let-values ([(fn iter) (iter)])
+              (if fn
+                (begin
+                  (loop iter #t)
+                  (display (vector-ref fn 0) output-port)
+                  (display ";" output-port))
+                ret)))
+        (display " 1\n" output-port)))
   (define (timed thunk)
     (let ((start (current-time)))
       (thunk)
