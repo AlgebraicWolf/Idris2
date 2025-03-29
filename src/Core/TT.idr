@@ -461,6 +461,8 @@ mkLocals outer bs (Erased fc Impossible) = Erased fc Impossible
 mkLocals outer bs (Erased fc Placeholder) = Erased fc Placeholder
 mkLocals outer bs (Erased fc (Dotted t)) = Erased fc (Dotted (mkLocals outer bs t))
 mkLocals outer bs (TType fc u) = TType fc u
+mkLocals outer bs (CostCentre fc nm tm)
+    = CostCentre fc (mkLocals outer bs nm) (mkLocals outer bs tm)
 
 export
 refsToLocals : Bounds bound -> Term vars -> Term (bound ++ vars)
@@ -495,6 +497,8 @@ substName x new (TDelay fc y t z)
     = TDelay fc y (substName x new t) (substName x new z)
 substName x new (TForce fc r y)
     = TForce fc r (substName x new y)
+substName x new (CostCentre fc nm tm)
+    = CostCentre fc (substName x new nm) (substName x new tm)
 substName x new tm = tm
 
 export
@@ -521,6 +525,8 @@ addMetas res ns (TForce fc r x) = addMetas res ns x
 addMetas res ns (PrimVal fc c) = ns
 addMetas res ns (Erased fc i) = foldr (flip $ addMetas res) ns i
 addMetas res ns (TType fc u) = ns
+addMetas res ns (CostCentre fc nm tm)
+    = addMetas res (addMetas res ns nm) tm
 
 -- Get the metavariable names in a term
 export
@@ -556,6 +562,8 @@ addRefs ua at ns (TForce fc r x) = addRefs ua at ns x
 addRefs ua at ns (PrimVal fc c) = ns
 addRefs ua at ns (Erased fc i) = foldr (flip $ addRefs ua at) ns i
 addRefs ua at ns (TType fc u) = ns
+addRefs ua at ns (CostCentre fc nm tm)
+    = addRefs ua at (addRefs ua at ns nm) tm
 
 -- As above, but for references. Also flag whether a name is under an
 -- 'assert_total' because we may need to know that in coverage/totality

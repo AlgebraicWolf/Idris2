@@ -196,6 +196,7 @@ toCExpTm n (PrimVal fc $ PrT c) = pure $ CCon fc (UN $ Basic $ show c) TYCON Not
 toCExpTm n (PrimVal fc c) = pure $ CPrimVal fc c -- Non-type constant
 toCExpTm n (Erased fc _) = pure $ CErased fc
 toCExpTm n (TType fc _) = pure $ CCon fc (UN (Basic "Type")) TYCON Nothing []
+toCExpTm n (CostCentre fc nm tm) = pure $ CCostCentre fc !(toCExp n nm) !(toCExp n tm)
 
 toCExp n tm
     = case getFnArgs tm of

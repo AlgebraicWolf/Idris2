@@ -131,6 +131,7 @@ isStrict (As _ _ a p) = isStrict a && isStrict p
 isStrict (TDelayed {}) = False
 isStrict (TDelay _ _ f x) = isStrict f && isStrict x
 isStrict (TForce _ _ tm) = isStrict tm
+isStrict (CostCentre _ nm tm) = isStrict nm && isStrict tm
 isStrict (PrimVal {}) = True
 isStrict (Erased {}) = True
 isStrict (TType {}) = True

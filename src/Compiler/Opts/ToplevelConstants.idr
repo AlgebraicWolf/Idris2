@@ -43,6 +43,7 @@ calls (NmConstCase fc sc xs x) =
 calls (NmPrimVal fc cst) = empty
 calls (NmErased fc) = empty
 calls (NmCrash fc str) = empty
+calls (NmCostCentre fc nm tm) = calls nm <+> calls tm
 
 defCalls : NamedDef -> SortedSet Name
 defCalls (MkNmFun args x) = calls x

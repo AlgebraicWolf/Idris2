@@ -911,10 +911,10 @@ mapTermM f = goTerm where
     goTerm (TDelayed fc la d) = f =<< TDelayed fc la <$> goTerm d
     goTerm (TDelay fc la ty arg) = f =<< TDelay fc la <$> goTerm ty <*> goTerm arg
     goTerm (TForce fc la t) = f =<< TForce fc la <$> goTerm t
+    goTerm (CostCentre fc nm tm) = f =<< CostCentre fc <$> goTerm nm <*> goTerm tm
     goTerm tm@(PrimVal {}) = f tm
     goTerm tm@(Erased {}) = f tm
     goTerm tm@(TType {}) = f tm
-
 
 export
 anyM : (a -> Core Bool) -> List a -> Core Bool

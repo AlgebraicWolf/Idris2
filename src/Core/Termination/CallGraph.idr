@@ -330,6 +330,8 @@ mutual
           urhs (Erased fc Placeholder) = Erased fc Placeholder
           urhs (Erased fc (Dotted t)) = Erased fc (Dotted (updateRHS ms t))
           urhs (TType fc u) = TType fc u
+          urhs (CostCentre fc nm tm)
+              = CostCentre fc (updateRHS ms nm) (updateRHS ms tm)
 
           lookupTm : Term vs -> List (Term vs, Term vs') -> Maybe (Term vs')
           lookupTm tm [] = Nothing

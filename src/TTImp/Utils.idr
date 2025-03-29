@@ -187,6 +187,8 @@ findBindableNamesQuot env used (IQuote fc x) = []
 findBindableNamesQuot env used (IQuoteName fc x) = []
 findBindableNamesQuot env used (IQuoteDecl fc xs) = []
 findBindableNamesQuot env used (IRunElab fc _ x) = []
+findBindableNamesQuot env used (ICostCentre fc nm tm)
+    = findBindableNamesQuot env used ![nm, tm]
 
 export
 findUniqueBindableNames :

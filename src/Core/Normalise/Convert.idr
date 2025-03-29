@@ -87,6 +87,7 @@ tryUpdate ms (TForce fc r tm) = pure $ TForce fc r !(tryUpdate ms tm)
 tryUpdate ms (PrimVal fc c) = pure $ PrimVal fc c
 tryUpdate ms (Erased fc a) = Erased fc <$> traverse (tryUpdate ms) a
 tryUpdate ms (TType fc u) = pure $ TType fc u
+tryUpdate ms (CostCentre fc nm tm) = pure $ CostCentre fc !(tryUpdate ms nm) !(tryUpdate ms tm)
 
 mutual
   allConvNF : {auto c : Ref Ctxt Defs} ->

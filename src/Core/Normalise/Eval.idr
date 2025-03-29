@@ -152,8 +152,11 @@ parameters (defs : Defs) (topopts : EvalOpts)
                   _ => pure (NForce fc r tm' stk)
     eval env locs (PrimVal fc c) stk = pure $ NPrimVal fc c
     eval env locs (Erased fc a) stk
-      = NErased fc <$> traverse @{%search} @{CORE} (\ t => eval env locs t stk) a
+        = NErased fc <$> traverse @{%search} @{CORE} (\ t => eval env locs t stk) a
     eval env locs (TType fc u) stk = pure $ NType fc u
+    eval env locs (CostCentre fc nm tm) stk
+        = eval env locs tm stk
+
 
     -- Apply an evaluated argument (perhaps cached from an earlier evaluation)
     -- to a stack

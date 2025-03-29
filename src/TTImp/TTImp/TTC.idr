@@ -92,6 +92,8 @@ mutual
         = do tag 30; toBuf fc; toBuf ns; toBuf rhs
     toBuf (IAutoApp fc fn arg)
         = do tag 31; toBuf fc; toBuf fn; toBuf arg
+    toBuf (ICostCentre fc nm tm)
+        = do tag 32; toBuf fc; toBuf nm; toBuf tm
 
     fromBuf
         = case !getTag of
@@ -186,6 +188,9 @@ mutual
                31 => do fc <- fromBuf; fn <- fromBuf
                         arg <- fromBuf
                         pure (IAutoApp fc fn arg)
+               32 => do fc <- fromBuf; nm <- fromBuf
+                        tm <- fromBuf
+                        pure (ICostCentre fc nm tm)
                _ => corrupt "RawImp"
 
   export

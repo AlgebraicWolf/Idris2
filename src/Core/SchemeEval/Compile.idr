@@ -284,9 +284,11 @@ compileStk svs stk (TForce fc x tm)
                       Vector (-5) [toScheme x, toScheme fc, Lambda [] tm']]
 compileStk svs stk (PrimVal fc c) = pure $ compileConstant fc c
 compileStk svs stk (Erased fc why)
-  = do why' <- compileWhyErased svs stk why
-       pure $ Vector (-6) [toScheme fc, toSchemeWhy why']
+    = do why' <- compileWhyErased svs stk why
+         pure $ Vector (-6) [toScheme fc, toSchemeWhy why']
 compileStk svs stk (TType fc u) = pure $ Vector (-7) [toScheme fc, toScheme u]
+compileStk svs stk (CostCentre fc nm tm)
+    = do compileStk svs stk tm
 
 export
 compile : Ref Sym Integer =>

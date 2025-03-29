@@ -96,6 +96,10 @@ parameters (fn1 : Name) (idIdx : Nat)
     where
         altEq : CConstAlt vars -> Bool
         altEq (MkConstAlt c exp) = cexpIdentity var con (Just c) exp
+    -- Should we only look at tm?
+    cexpIdentity var con const (CCostCentre fc nm tm) =
+        cexpIdentity var con const nm
+        && cexpIdentity var con const tm
     cexpIdentity _ _ (Just c1) (CPrimVal _ c2) = c1 == c2
     cexpIdentity _ _ Nothing (CPrimVal {}) = False
     cexpIdentity _ _ _ (CErased _) = False

@@ -138,6 +138,9 @@ mutual
        -- with-disambiguation
        IWithUnambigNames : FC -> List (FC, Name) -> RawImp' nm -> RawImp' nm
 
+       -- Cost centre
+       ICostCentre : FC -> RawImp' nm -> RawImp' nm -> RawImp' nm
+
   %name RawImp' t, u
 
   public export
@@ -219,6 +222,7 @@ mutual
       show (Implicit fc True) = "_"
       show (Implicit fc False) = "?"
       show (IWithUnambigNames fc ns rhs) = "(%with " ++ show ns ++ " " ++ show rhs ++ ")"
+      show (ICostCentre fc nm tm) = "(%costcentre " ++ show nm ++ " " ++ show tm ++ ")"
 
   export
   covering
@@ -905,6 +909,7 @@ getFC (IRunElab x _ _) = x
 getFC (IAs x _ _ _ _) = x
 getFC (Implicit x _) = x
 getFC (IWithUnambigNames x _ _) = x
+getFC (ICostCentre x _ _) = x
 
 namespace ImpDecl
 

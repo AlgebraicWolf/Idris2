@@ -167,6 +167,11 @@ mutual
     traverse (dropConstAlt inn) xs <*>
     traverse (dropCExp inn) x
 
+  dropCExp inn (CCostCentre fc nm tm) =
+    CCostCentre fc  <$>
+    dropCExp inn nm <*>
+    dropCExp inn tm
+
   dropCExp inn (CPrimVal fc x) = Just $ CPrimVal fc x
   dropCExp inn (CErased fc) = Just $ CErased fc
   dropCExp inn (CCrash fc x) = Just $ CCrash fc x
@@ -288,6 +293,11 @@ mutual
     (sxs, xs') <- unzip <$> traverse analyzeConstAlt xs
     (sx, x')   <- analyzeMaybe x
     pure (ssc + sum sxs + sx + 1, CConstCase f sc' xs' x')
+
+  analyzeSubExp (CCostCentre fc nm tm) = do
+    (snm, nm') <- analyze nm
+    (stm, tm') <- analyze tm
+    pure (snm + stm + 1, CCostCentre fc nm' tm')
 
   analyzeSubExp c@(CPrimVal {}) = pure (1, c)
   analyzeSubExp c@(CErased {})  = pure (1, c)
@@ -450,6 +460,8 @@ mutual
     replaceExp pc sc                 <*>
     traverse (replaceConstAlt pc) xs <*>
     traverseOpt (replaceExp pc) x
+  replaceExp pc (CCostCentre f nm tm)
+    = pure $ CCostCentre f !(replaceExp pc nm) !(replaceExp pc tm)
 
   replaceExp _ c@(CPrimVal {}) = pure c
   replaceExp _ c@(CErased {})  = pure c

@@ -600,6 +600,7 @@ mutual
   liftExp (CPrimVal fc c) = pure $ LPrimVal fc c
   liftExp (CErased fc) = pure $ LErased fc
   liftExp (CCrash fc str) = pure $ LCrash fc str
+  liftExp (CCostCentre _ _ tm) = liftExp {doLazyAnnots} tm
 
 export
 liftBody : {vars : _} -> {doLazyAnnots : Bool} ->

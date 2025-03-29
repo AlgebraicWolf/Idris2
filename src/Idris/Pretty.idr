@@ -360,6 +360,10 @@ mutual
     prettyPrec d (PDotted _ p) = dot <+> prettyPrec d p
     prettyPrec d (PImplicit _) = "_"
     prettyPrec d (PInfer _) = annotate Hole $ "?"
+    prettyPrec d (PCostCentre _ nm tm) =
+        parenthesise (d > startPrec) $ pragma "%costCentre"
+                                  <++> parens (pretty nm)
+                                  <++> pretty tm
     prettyPrec d (POp _ (MkWithData _ $ BindType nm left) op right) =
         group $ parens (prettyPrec d nm <++> ":" <++> pretty left)
            <++> prettyOp op.val.toName

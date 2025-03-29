@@ -181,6 +181,8 @@ mutual
         = hashWithSalt h 10
     hashWithSalt h (TType fc u)
         = hashWithSalt h 11 `hashWithSalt` u
+    hashWithSalt h (CostCentre fc nm tm)
+        = h `hashWithSalt` 12 `hashWithSalt` nm `hashWithSalt` tm
 
   export
   Hashable Pat where
@@ -457,6 +459,8 @@ mutual
         h `hashWithSalt` 13
       NmCrash fc msg =>
         h `hashWithSalt` 14 `hashWithSalt` msg
+      NmCostCentre fc nm tm =>
+        h `hashWithSalt` 15 `hashWithSalt` nm `hashWithSalt` tm
 
   export
   Hashable NamedConAlt where

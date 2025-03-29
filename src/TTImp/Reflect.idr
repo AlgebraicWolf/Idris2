@@ -243,6 +243,11 @@ mutual
                           ns' <- reify defs !(evalClosure defs ns)
                           t' <- reify defs !(evalClosure defs t)
                           pure (IWithUnambigNames fc' ns' t')
+               (UN (Basic "ICostCentre"), [fc, nm, tm])
+                   => do fc' <- reify defs !(evalClosure defs fc)
+                         nm' <- reify defs !(evalClosure defs nm)
+                         tm' <- reify defs !(evalClosure defs tm)
+                         pure (ICostCentre fc' nm' tm')
                _ => cantReify val "TTImp"
     reify defs val = cantReify val "TTImp"
 
@@ -645,6 +650,11 @@ mutual
              ns' <- reflect fc defs lhs env ns
              t' <- reflect fc defs lhs env t
              appCon fc defs (reflectionttimp "IWithUnambigNames") [fc', ns', t']
+    reflect fc defs lhs env (ICostCentre tfc nm tm)
+        = do fc' <- reflect fc defs lhs env tfc
+             nm' <- reflect fc defs lhs env nm
+             tm' <- reflect fc defs lhs env tm
+             appCon fc defs (reflectionttimp "ICostCentre") [fc', nm', tm']
 
   export
   Reflect IFieldUpdate where
