@@ -455,6 +455,8 @@ HasNames (Term vars) where
            pure (TType fc (fullname gdef))
   full gam (Erased fc (Dotted t))
       = pure (Erased fc (Dotted !(full gam t)))
+  full gam (CostCentre fc nm tm)
+      = pure (CostCentre fc !(full gam nm) !(full gam tm))
   full gam tm = pure tm
 
   resolved gam (Ref fc x n)
@@ -484,6 +486,8 @@ HasNames (Term vars) where
            pure (TType fc (Resolved i))
   resolved gam (Erased fc (Dotted t))
       = pure (Erased fc (Dotted !(resolved gam t)))
+  resolved gam (CostCentre fc nm tm)
+      = pure (CostCentre fc !(resolved gam nm) !(resolved gam tm))
   resolved gam tm = pure tm
 
 export

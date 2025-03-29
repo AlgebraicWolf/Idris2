@@ -335,7 +335,7 @@ mutual
   {vars : _} -> TTC (Term vars) where
     toBuf (Local {name} fc c idx y)
         = if idx < 243
-             then do tag (13 + cast idx)
+             then do tag (14 + cast idx)
                      toBuf c
              else do tag 0
                      toBuf c
@@ -356,7 +356,7 @@ mutual
                   [arg] => do tag 4
                               toBuf fn
                               toBuf arg
-                  args => do tag 12
+                  args => do tag 13
                              toBuf fn
                              toBuf args
     toBuf (As fc s as tm)
@@ -378,6 +378,8 @@ mutual
         = tag 10
     toBuf (TType fc u)
         = do tag 11; toBuf u
+    toBuf (CostCentre fc nm tm)
+        = do tag 12; toBuf nm; toBuf tm
 
     fromBuf {vars}
         = case !getTag of
@@ -410,11 +412,14 @@ mutual
                        pure (PrimVal emptyFC c)
                10 => pure (Erased emptyFC Placeholder)
                11 => do u <- fromBuf; pure (TType emptyFC u)
-               12 => do fn <- fromBuf
+               12 => do nm <- fromBuf
+                        tm <- fromBuf
+                        pure (CostCentre emptyFC nm tm)
+               13 => do fn <- fromBuf
                         args <- fromBuf
                         pure (apply emptyFC fn args)
                idxp => do c <- fromBuf
-                          let idx : Nat = fromInteger (cast (idxp - 13))
+                          let idx : Nat = fromInteger (cast (idxp - 14))
                           let Just name = getAt idx vars
                               | Nothing => corrupt "Term"
                           pure (Local {name} emptyFC c idx (mkPrf idx))
@@ -752,6 +757,7 @@ mutual
     toBuf (CPrimVal fc c) = do tag 12; toBuf fc; toBuf c
     toBuf (CErased fc) = do tag 13; toBuf fc
     toBuf (CCrash fc msg) = do tag 14; toBuf fc; toBuf msg
+    toBuf (CCostCentre fc nm tm) = do tag 15; toBuf fc; toBuf nm; toBuf tm
 
     fromBuf
         = assert_total $ case !getTag of
@@ -803,6 +809,10 @@ mutual
                14 => do fc <- fromBuf
                         msg <- fromBuf
                         pure (CCrash fc msg)
+               15 => do fc <- fromBuf
+                        nm <- fromBuf
+                        tm <- fromBuf
+                        pure (CCostCentre fc nm tm)
                _ => corrupt "CExp"
 
   export
