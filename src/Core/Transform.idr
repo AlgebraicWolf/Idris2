@@ -83,6 +83,10 @@ tryReplace ms (Erased fc Impossible) = pure (Erased fc Impossible)
 tryReplace ms (Erased fc Placeholder) = pure (Erased fc Placeholder)
 tryReplace ms (Erased fc (Dotted t)) = Erased fc . Dotted <$> tryReplace ms t
 tryReplace ms (TType fc u) = pure (TType fc u)
+tryReplace ms (CostCentre fc nm tm)
+    = do nm' <- tryReplace ms nm
+         tm' <- tryReplace ms tm
+         pure (CostCentre fc nm' tm')
 
 covering
 tryApply : Transform -> Term vs -> Maybe (Term vs)

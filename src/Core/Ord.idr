@@ -81,6 +81,7 @@ mutual
         CPrimVal _ c1 `compare` CPrimVal _ c2 = compare c1 c2
         CErased _ `compare` CErased _ = EQ
         CCrash _ m1 `compare` CCrash _ m2 = compare m1 m2
+        CCostCentre _ nm1 tm1 `compare` CCostCentre _ nm2 tm2 = compare nm1 nm2 `thenCmp` compare tm1 tm2
         e1 `compare` e2 = compare (tag e1) (tag e2)
           where
             tag : forall vars . CExp vars -> Int
@@ -99,6 +100,7 @@ mutual
             tag (CPrimVal _ _) = 12
             tag (CErased _) = 13
             tag (CCrash _ _) = 14
+            tag (CCostCentre _ _ _) = 15
 
     export
     covering

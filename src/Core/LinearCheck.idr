@@ -394,6 +394,11 @@ mutual
       -- Not universe checking here, just use the top of the hierarchy
       = do log "quantity" 15 "lcheck TType"
            pure (TType fc u, gType fc (MN "top" 0), [])
+  lcheck rig erase env (CostCentre fc nm tm)
+      = do log "quantity" 15 "lcheck CostCentre"
+           (nm', _, nmused) <- lcheck rig erase env nm
+           (tm', ty, tyused) <- lcheck rig erase env tm
+           pure (CostCentre fc nm' tm', ty, nmused ++ tyused)
 
   lcheckBinder : {vars : _} ->
                  {auto c : Ref Ctxt Defs} ->

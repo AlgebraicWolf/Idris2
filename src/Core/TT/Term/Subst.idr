@@ -39,6 +39,8 @@ substTerm outer dropped env (Erased fc Impossible) = Erased fc Impossible
 substTerm outer dropped env (Erased fc Placeholder) = Erased fc Placeholder
 substTerm outer dropped env (Erased fc (Dotted t)) = Erased fc (Dotted (substTerm outer dropped env t))
 substTerm outer dropped env (TType fc u) = TType fc u
+substTerm outer dropped env (CostCentre fc nm ty)
+    = CostCentre fc (substTerm outer dropped env nm) (substTerm outer dropped env ty)
 
 substTerms outer dropped env xs
   = assert_total $ map (substTerm outer dropped env) xs

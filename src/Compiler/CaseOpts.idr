@@ -84,6 +84,8 @@ mutual
   shiftBinder new (CPrimVal fc c) = CPrimVal fc c
   shiftBinder new (CErased fc) = CErased fc
   shiftBinder new (CCrash fc msg) = CCrash fc msg
+  shiftBinder new (CCostCentre fc nm tm) =
+    CCostCentre fc (shiftBinder new nm) (shiftBinder new tm)
 
   shiftBinderConAlt : {outer, args : _} ->
                 (new : Name) ->

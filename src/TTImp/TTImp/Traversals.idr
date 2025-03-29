@@ -127,3 +127,4 @@ parameters (f : RawImp' nm -> RawImp' nm)
   mapTTImp (IUnifyLog fc x t) = f $ IUnifyLog fc x (mapTTImp t)
   mapTTImp (Implicit fc bindIfUnsolved) = f $ Implicit fc bindIfUnsolved
   mapTTImp (IWithUnambigNames fc xs t) = f $ IWithUnambigNames fc xs (mapTTImp t)
+  mapTTImp (ICostCentre fc nm tm) = f $ ICostCentre fc (mapTTImp nm) (mapTTImp tm)

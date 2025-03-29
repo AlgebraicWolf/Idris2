@@ -172,6 +172,8 @@ constFold rho (CConstCase fc sc xs x) =
 constFold rho (CPrimVal fc v) = CPrimVal fc v
 constFold rho (CErased fc) = CErased fc
 constFold rho (CCrash fc err) = CCrash fc err
+constFold rho (CCostCentre fc nm tm) =
+    CCostCentre fc (constFold rho nm) (constFold rho tm)
 
 constFoldCDef : CDef -> Maybe CDef
 constFoldCDef (MkFun args exp)

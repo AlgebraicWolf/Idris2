@@ -31,6 +31,7 @@ parameters (fn : Name)
     simple (CPrimVal _ _) = True
     simple (CErased _) = True
     simple (CCrash _ _) = False
+    simple (CCostCentre _ nm tm) = simple nm && simple tm
 
     inlineCDef : CDef -> Bool
     inlineCDef (MkFun args exp) =

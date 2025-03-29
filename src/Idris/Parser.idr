@@ -1064,6 +1064,11 @@ mutual
                    do decoratedPragma fname "runElab"
                       expr pdef fname indents
             pure (PRunElab (boundToFC fname b) b.val)
+     <|> do b <- bounds $ do decoratedPragma fname "costCentre"
+                             expr pdef fname indents
+            (PApp _ nm tm) <- pure b.val
+              | _ => fail "oh noo"
+            pure (PCostCentre (boundToFC fname b) nm tm)
      <|> opExpr q fname indents
 
   interpBlock : ParseOpts -> OriginDesc -> IndentInfo -> Rule PTerm

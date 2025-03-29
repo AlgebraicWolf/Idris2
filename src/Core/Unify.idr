@@ -570,6 +570,8 @@ tryInstantiate {newvars} loc mode env mname mref num mdef locs otm tm
     updateIVars ivs (Erased fc Placeholder) = Just (Erased fc Placeholder)
     updateIVars ivs (Erased fc (Dotted t)) = Erased fc . Dotted <$> updateIVars ivs t
     updateIVars ivs (TType fc u) = Just (TType fc u)
+    updateIVars ivs (CostCentre fc nm tm)
+        = Just (CostCentre fc !(updateIVars ivs nm) !(updateIVars ivs tm))
 
     mkDef : {vs, newvars : _} ->
             List (Var newvars) ->

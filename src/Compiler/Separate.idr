@@ -113,6 +113,7 @@ mutual
     nsRefs (NmConstCase fc scrut alts mbDflt) =
       nsRefs scrut <+> concatMap nsRefs alts <+> concatMap nsRefs mbDflt
     nsRefs (NmCrash fc msg) = SortedSet.empty
+    nsRefs (NmCostCentre fc nm tm) = nsRefs nm <+> nsRefs tm
 
   export
   HasNamespaces NamedConAlt where

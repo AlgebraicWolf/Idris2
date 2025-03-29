@@ -303,6 +303,7 @@ mutual
   used n (NmConstCase _ sc alts def)
       = used n sc || any (usedConst n) alts
             || maybe False (used n) def
+  used n (NmCostCentre _ nm tm) = used n nm || used n tm
   used n _ = False
 
   usedCon : Name -> NamedConAlt -> Bool
@@ -637,6 +638,17 @@ parameters (constants : SortedSet Name)
     schExp i (NmPrimVal fc c) = pure $ schConstant schString c
     schExp i (NmErased fc) = pure "'erased"
     schExp i (NmCrash fc msg) = pure $ "(blodwen-error-quit " ++ showB msg ++ ")"
+    schExp i (NmCostCentre fc nm tm)
+        = do body <- schExp i tm
+             name <- schExp i nm
+             -- TODO only emit a mark when profiling is enabled.
+             -- Would need to drag context to a bunch of places for that
+             pure $ "(blodwen-cost-centre " ++ name ++ " " ++ body ++ ")"
+             --if isJust defs.options.session.samplingProfile
+             --  then do
+             --    label <- schExp i nm
+             --    pure $ "(blodwen-cost-centre " ++ label ++ " " ++ body ++ ")"
+             --  else pure body
 
   -- External primitives which are common to the scheme codegens (they can be
   -- overridden)

@@ -213,6 +213,8 @@ mutual
 
   stmt _ (NmCrash _ x)   = pure $ Error x
 
+  stmt e (NmCostCentre _ _ tm) = stmt e tm
+
   -- a single branch in a pattern match on constructors
   conAlt :  { auto c : Ref ESs ESSt }
          -> (e         : Effect)

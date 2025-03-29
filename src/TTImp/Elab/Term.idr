@@ -20,6 +20,7 @@ import TTImp.Elab.As
 import TTImp.Elab.Binders
 import TTImp.Elab.Case
 import TTImp.Elab.Check
+import TTImp.Elab.CostCentre
 import TTImp.Elab.Dot
 import TTImp.Elab.Hole
 import TTImp.Elab.ImplicitBind
@@ -216,6 +217,8 @@ checkTerm rig elabinfo nest env (IHole fc str) exp
     = checkHole rig elabinfo nest env fc (Basic str) exp
 checkTerm rig elabinfo nest env (IUnifyLog fc lvl tm) exp
     = withLogLevel lvl $ check rig elabinfo nest env tm exp
+checkTerm rig elabinfo nest env (ICostCentre fc nm tm) exp
+    = checkCostCentre rig elabinfo nest env fc nm tm exp
 checkTerm rig elabinfo nest env (Implicit fc b) (Just gexpty)
     = do nm <- genName "_"
          expty <- getTerm gexpty

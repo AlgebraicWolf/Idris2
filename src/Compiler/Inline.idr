@@ -265,6 +265,8 @@ mutual
   eval rec env stk (CPrimVal fc c) = pure $ unload stk $ CPrimVal fc c
   eval rec env stk (CErased fc) = pure $ unload stk $ CErased fc
   eval rec env stk (CCrash fc str) = pure $ unload stk $ CCrash fc str
+  eval rec env stk (CCostCentre fc nm tm)
+      = pure $ unload stk $ CCostCentre fc !(eval rec env [] nm) !(eval rec env [] tm)
 
   extendLoc : {auto l : Ref LVar Int} ->
               FC -> EEnv free vars -> (args' : List Name) ->
@@ -489,6 +491,7 @@ mutual
   addRefs ds (CConstCase _ sc alts def)
       = let ds' = maybe ds (addRefs ds) def in
             addRefsConstAlts (addRefs ds' sc) alts
+  addRefs ds (CCostCentre _ nm tm) = addRefs (addRefs ds nm) tm
   addRefs ds tm = ds
 
   addRefsArgs : NameMap Bool -> List (CExp vars) -> NameMap Bool

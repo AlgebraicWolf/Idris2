@@ -160,6 +160,10 @@ mutual
   dropEnv (CPrimVal fc x) = Just $ CPrimVal fc x
   dropEnv (CErased fc) = Just $ CErased fc
   dropEnv (CCrash fc x) = Just $ CCrash fc x
+  dropEnv (CCostCentre fc nm tm) =
+    CCostCentre fc <$>
+    dropEnv nm     <*>
+    dropEnv tm
 
   dropConAlt :  {pre : List Name}
              -> CConAlt (pre ++ ns)
@@ -283,6 +287,12 @@ mutual
   analyzeSubExp c@(CPrimVal _ _) = pure (1, c)
   analyzeSubExp c@(CErased _)    = pure (1, c)
   analyzeSubExp c@(CCrash _ _)   = pure (1, c)
+  -- We shall not allow looking inside the cost centre,
+  -- as lifting things out of it would cause problems.
+  -- However, lifting things out of name is OK.
+  analyzeSubExp (CCostCentre fc nm tm) = do
+    (snm, nm') <- analyze nm
+    pure (snm + 1, CCostCentre fc nm tm)
 
   analyzeConAlt :  { auto c : Ref Sts St }
                 -> CConAlt ns
@@ -441,6 +451,8 @@ mutual
     replaceExp pc sc                 <*>
     traverse (replaceConstAlt pc) xs <*>
     traverseOpt (replaceExp pc) x
+  replaceExp pc (CCostCentre f nm tm)
+    = pure $ CCostCentre f !(replaceExp pc nm) !(replaceExp pc tm)
 
   replaceExp _ c@(CPrimVal _ _) = pure c
   replaceExp _ c@(CErased _)    = pure c

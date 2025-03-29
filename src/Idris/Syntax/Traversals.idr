@@ -103,6 +103,10 @@ mapPTermM f = goPTerm where
       >>= f
     goPTerm t@(PImplicit _) = f t
     goPTerm t@(PInfer _) = f t
+    goPTerm (PCostCentre fc nm tm) =
+      PCostCentre fc <$> goPTerm nm
+                     <*> goPTerm tm
+      >>= f
     goPTerm (POp fc bind op right) =
       POp fc
           <$> traverseFC goOpBinder bind
@@ -477,6 +481,8 @@ mapPTerm f = goPTerm where
       = f $ PDotted fc $ goPTerm x
     goPTerm t@(PImplicit _) = f t
     goPTerm t@(PInfer _) = f t
+    goPTerm (PCostCentre fc nm tm) =
+      f $ PCostCentre fc (goPTerm nm) (goPTerm tm)
     goPTerm (POp fc autoBindInfo opName z)
       = f $ POp fc (mapFC (map f) autoBindInfo) opName (goPTerm z)
     goPTerm (PPrefixOp fc x y)
@@ -688,6 +694,7 @@ substFC fc = mapPTerm $ \case
   PDotted _ x => PDotted fc x
   PImplicit _ => PImplicit fc
   PInfer _ => PInfer fc
+  PCostCentre _ nm tm => PCostCentre fc nm tm
   POp _ ab nm r => POp fc (setFC fc ab) nm r
   PPrefixOp _ x y => PPrefixOp fc (setFC fc x) y
   PSectionL _ x y => PSectionL fc (setFC fc x) y

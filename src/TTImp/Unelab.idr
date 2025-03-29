@@ -313,6 +313,10 @@ mutual
     = unelabTy' umode nest env t
   unelabTy' umode nest env (Erased fc _) = pure (Implicit fc True, gErased fc)
   unelabTy' umode nest env (TType fc _) = pure (IType fc, gType fc (MN "top" 0))
+  unelabTy' umode nest env (CostCentre fc nm tm)
+      = do (nm', _) <- unelabTy' umode nest env nm
+           (tm', ty) <- unelabTy' umode nest env tm
+           pure (ICostCentre fc nm' tm', ty)
 
   unelabPi : {vars : _} ->
              {auto c : Ref Ctxt Defs} ->
