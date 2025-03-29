@@ -207,6 +207,7 @@ swapVars (Erased fc Impossible) = Erased fc Impossible
 swapVars (Erased fc Placeholder) = Erased fc Placeholder
 swapVars (Erased fc (Dotted t)) = Erased fc $ Dotted (swapVars t)
 swapVars (TType fc u) = TType fc u
+swapVars (CostCentre fc nm tm) = CostCentre fc (swapVars nm) (swapVars tm)
 
 -- Push an explicit pi binder as far into a term as it'll go. That is,
 -- move it under implicit binders that don't depend on it, and stop

@@ -76,7 +76,8 @@ mutual
       = Implicit fc b
     map f (IWithUnambigNames fc ns t)
       = IWithUnambigNames fc ns (map f t)
-
+    map f (ICostCentre fc nm tm)
+      = ICostCentre fc (map f nm) (map f tm)
   export
   Functor ImpClause' where
     map f (PatClause fc lhs rhs)

@@ -133,6 +133,8 @@ fuzzySearch expr = do
     fromMaybe [] ((:: []) <$> parseNameOrConst (PPrimVal fc c)) ++ ns
   doFind ns (Erased fc i) = ns
   doFind ns (TType fc _) = AType :: ns
+  doFind ns (CostCentre fc nm tm)
+      = doFind (doFind ns nm) tm
 
   toFullNames' : NameOrConst -> Core NameOrConst
   toFullNames' (AName x) = AName <$> toFullNames x

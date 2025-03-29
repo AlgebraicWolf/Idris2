@@ -133,6 +133,7 @@ isStrict (TForce _ _ tm) = isStrict tm
 isStrict (PrimVal _ _) = True
 isStrict (Erased _ _) = True
 isStrict (TType _ _) = True
+isStrict (CostCentre _ nm tm) = isStrict nm && isStrict tm
 
 ||| Get the name and definition of a list of names.
 getConsGDef :

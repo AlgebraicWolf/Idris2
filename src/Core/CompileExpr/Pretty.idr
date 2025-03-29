@@ -99,6 +99,9 @@ mutual
   prettyPrecNamedCExp d (NmCrash _ x)
       = parenthesise (d > Open) $
           sep [annotate Keyword "crash", byShow x]
+  prettyPrecNamedCExp d (NmCostCentre _ nm tm)
+      = parenthesise (d > Open) $
+          sep [annotate Keyword "costCentre", prettyPrecNamedCExp App nm, prettyPrecNamedCExp App tm]
 
   prettyNamedConAlt : NamedConAlt -> Doc IdrisSyntax
   prettyNamedConAlt (MkNConAlt x ci tag args exp)

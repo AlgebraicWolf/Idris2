@@ -107,6 +107,8 @@ mutual
        CErased : FC -> CExp vars
        -- Some sort of crash?
        CCrash : FC -> String -> CExp vars
+       -- A user-introduced cost centre
+       CCostCentre : FC -> CExp vars -> CExp vars -> CExp vars
 
   public export
   data CConAlt : List Name -> Type where
@@ -159,6 +161,8 @@ mutual
        NmErased : FC -> NamedCExp
        -- Some sort of crash?
        NmCrash : FC -> String -> NamedCExp
+       -- A user-introduced cost centre
+       NmCostCentre : FC -> NamedCExp -> NamedCExp -> NamedCExp
 
   public export
   data NamedConAlt : Type where
@@ -254,6 +258,7 @@ mutual
     show (NmPrimVal _ x) = show x
     show (NmErased _) = "___"
     show (NmCrash _ x) = "(CRASH " ++ show x ++ ")"
+    show (NmCostCentre _ nm tm) = "(%costCentre " ++ show nm ++ " " ++ show tm ++ ")"
 
   export
   Show NamedConAlt where
@@ -339,6 +344,8 @@ mutual
   forgetExp locs (CPrimVal fc c) = NmPrimVal fc c
   forgetExp locs (CErased fc) = NmErased fc
   forgetExp locs (CCrash fc msg) = NmCrash fc msg
+  forgetExp locs (CCostCentre fc nm tm)
+      = NmCostCentre fc (forgetExp locs nm) (forgetExp locs tm)
 
   forgetConAlt : Names vars -> CConAlt vars -> NamedConAlt
   forgetConAlt locs (MkConAlt n ci t args exp)
@@ -453,6 +460,8 @@ mutual
   insertNames outer ns (CConstCase fc sc xs def)
       = CConstCase fc (insertNames outer ns sc) (assert_total (map (insertNamesConstAlt outer ns) xs))
                    (assert_total (map (insertNames outer ns) def))
+  insertNames outer ns (CCostCentre fc nm tm)
+      = CCostCentre fc (insertNames outer ns nm) (insertNames outer ns tm)
   insertNames _ _ (CPrimVal fc x) = CPrimVal fc x
   insertNames _ _ (CErased fc) = CErased fc
   insertNames _ _ (CCrash fc x) = CCrash fc x
@@ -511,6 +520,8 @@ mutual
       = CConstCase fc (shrinkCExp sub sc)
                    (assert_total (map (shrinkConstAlt sub) xs))
                    (assert_total (map (shrinkCExp sub) def))
+  shrinkCExp sub (CCostCentre fc nm tm)
+      = CCostCentre fc (shrinkCExp sub nm) (shrinkCExp sub tm)
   shrinkCExp _ (CPrimVal fc x) = CPrimVal fc x
   shrinkCExp _ (CErased fc) = CErased fc
   shrinkCExp _ (CCrash fc x) = CCrash fc x
@@ -563,6 +574,9 @@ mutual
       = CConstCase fc (substEnv outer dropped env sc)
                    (assert_total (map (substConstAlt outer dropped env) xs))
                    (assert_total (map (substEnv outer dropped env) def))
+  substEnv outer dropped env (CCostCentre fc nm tm)
+      = CCostCentre fc (substEnv outer dropped env nm)
+                       (substEnv outer dropped env tm)
   substEnv _ _ _ (CPrimVal fc x) = CPrimVal fc x
   substEnv _ _ _ (CErased fc) = CErased fc
   substEnv _ _ _ (CCrash fc x) = CCrash fc x
@@ -622,6 +636,8 @@ mutual
       = CConstCase fc (mkLocals later bs sc)
                  (assert_total (map (mkLocalsConstAlt later bs) xs))
                  (assert_total (map (mkLocals later bs) def))
+  mkLocals later bs (CCostCentre fc nm tm)
+      = CCostCentre fc (mkLocals later bs nm) (mkLocals later bs tm)
   mkLocals later bs (CPrimVal fc x) = CPrimVal fc x
   mkLocals later bs (CErased fc) = CErased fc
   mkLocals later bs (CCrash fc x) = CCrash fc x
@@ -665,6 +681,7 @@ getFC (CConstCase fc _ _ _) = fc
 getFC (CPrimVal fc _) = fc
 getFC (CErased fc) = fc
 getFC (CCrash fc _) = fc
+getFC (CCostCentre fc _ _) = fc
 
 namespace NamedCExp
   export
@@ -684,3 +701,4 @@ namespace NamedCExp
   getFC (NmPrimVal fc _) = fc
   getFC (NmErased fc) = fc
   getFC (NmCrash fc _) = fc
+  getFC (NmCostCentre fc _ _) = fc
