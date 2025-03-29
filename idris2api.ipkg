@@ -292,6 +292,7 @@ modules =
     TTImp.Elab.Binders,
     TTImp.Elab.Case,
     TTImp.Elab.Check,
+    TTImp.Elab.CostCentre,
     TTImp.Elab.Delayed,
     TTImp.Elab.Dot,
     TTImp.Elab.Hole,

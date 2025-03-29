@@ -119,6 +119,7 @@ data Term : Scoped where
      Erased : FC -> WhyErased (Term vars) -> Term vars
      TType : FC -> Name -> -- universe variable
              Term vars
+     CostCentre : FC -> Term vars -> Term vars -> Term vars
 
 %name Term t, u
 
@@ -153,6 +154,8 @@ insertNames out ns (Erased fc Impossible) = Erased fc Impossible
 insertNames out ns (Erased fc Placeholder) = Erased fc Placeholder
 insertNames out ns (Erased fc (Dotted t)) = Erased fc (Dotted (insertNames out ns t))
 insertNames out ns (TType fc u) = TType fc u
+insertNames out ns (CostCentre fc nm tm)
+    = CostCentre fc (insertNames out ns nm) (insertNames out ns tm)
 
 export
 compatTerm : CompatibleVars xs ys -> Term xs -> Term ys
@@ -223,6 +226,8 @@ mutual
   shrinkTerm (Erased fc Impossible) prf = Just (Erased fc Impossible)
   shrinkTerm (Erased fc (Dotted t)) prf = Erased fc . Dotted <$> shrinkTerm t prf
   shrinkTerm (TType fc u) prf = Just (TType fc u)
+  shrinkTerm (CostCentre fc nm tm) prf
+     = Just (CostCentre fc !(shrinkTerm nm prf) !(shrinkTerm tm prf))
 
 
 mutual
@@ -259,6 +264,8 @@ mutual
   thinTerm (Erased fc Placeholder) th = Erased fc Placeholder
   thinTerm (Erased fc (Dotted t)) th = Erased fc (Dotted (thinTerm t th))
   thinTerm (TType fc u) th = TType fc u
+  thinTerm (CostCentre fc nm tm) th
+      = CostCentre fc (thinTerm nm th) (thinTerm tm th)
 
 export
 GenWeaken Term where
@@ -409,6 +416,7 @@ getLoc (TForce fc _ _) = fc
 getLoc (PrimVal fc _) = fc
 getLoc (Erased fc i) = fc
 getLoc (TType fc _) = fc
+getLoc (CostCentre fc _ _) = fc
 
 export
 Eq LazyReason where
@@ -461,6 +469,7 @@ eqTerm (TForce _ _ t) (TForce _ _ t') = eqTerm t t'
 eqTerm (PrimVal _ c) (PrimVal _ c') = c == c'
 eqTerm (Erased _ i) (Erased _ i') = assert_total (eqWhyErasedBy eqTerm i i')
 eqTerm (TType _ _) (TType _ _) = True
+eqTerm (CostCentre _ nm tm) (CostCentre _ nm' tm') = eqTerm nm nm' && eqTerm tm tm'
 eqTerm _ _ = False
 
 export

@@ -146,6 +146,7 @@ mutual
        PDotted : FC -> PTerm' nm -> PTerm' nm
        PImplicit : FC -> PTerm' nm
        PInfer : FC -> PTerm' nm
+       PCostCentre : FC -> (label : PTerm' nm) -> (expr : PTerm' nm) -> PTerm' nm
 
        -- Operators
 
@@ -219,6 +220,7 @@ mutual
   getPTermLoc (PDotted fc _) = fc
   getPTermLoc (PImplicit fc) = fc
   getPTermLoc (PInfer fc) = fc
+  getPTermLoc (PCostCentre fc _ _) = fc
   getPTermLoc (POp fc _ _ _) = fc
   getPTermLoc (PPrefixOp fc _ _) = fc
   getPTermLoc (PSectionL fc _ _) = fc
@@ -961,6 +963,7 @@ parameters {0 nm : Type} (toName : nm -> Name)
   showPTermPrec d (PDotted _ p) = "." ++ showPTermPrec d p
   showPTermPrec _ (PImplicit _) = "_"
   showPTermPrec _ (PInfer _) = "?"
+  showPTermPrec d (PCostCentre _ n tm) = "%runElab" ++ showPTermPrec d n ++ showPTermPrec d tm
   showPTermPrec d (POp _ (MkFCVal _ $ NoBinder left) op right)
         = showPTermPrec d left ++ " " ++ showOpPrec d op.val ++ " " ++ showPTermPrec d right
   showPTermPrec d (POp _ (MkFCVal _ $ BindType nm left) op right)
