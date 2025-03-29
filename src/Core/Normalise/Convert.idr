@@ -81,6 +81,7 @@ tryUpdate ms (TForce fc r tm) = pure $ TForce fc r !(tryUpdate ms tm)
 tryUpdate ms (PrimVal fc c) = pure $ PrimVal fc c
 tryUpdate ms (Erased fc a) = Erased fc <$> traverse (tryUpdate ms) a
 tryUpdate ms (TType fc u) = pure $ TType fc u
+tryUpdate ms (CostCentre fc nm tm) = pure $ CostCentre fc !(tryUpdate ms nm) !(tryUpdate ms tm)
 
 mutual
   allConvNF : {auto c : Ref Ctxt Defs} ->
@@ -119,6 +120,8 @@ mutual
       quickConvArg (NForce _ _ t _) (NForce _ _ t' _) = quickConvArg t t'
       quickConvArg (NPrimVal _ c) (NPrimVal _ c') = c == c'
       quickConvArg (NType _ _) (NType _ _) = True
+      quickConvArg (NCostCentre _ nm tm) (NCostCentre _ nm' tm')
+          = quickConvArg nm nm' && quickConvArg tm tm'
       quickConvArg (NErased _ _) _ = True
       quickConvArg _ (NErased _ _) = True
       quickConvArg _ _ = False

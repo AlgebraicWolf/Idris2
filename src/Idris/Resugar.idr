@@ -400,6 +400,10 @@ mutual
   toPTerm p (IWithUnambigNames fc ns rhs) =
     PWithUnambigNames fc ns <$> toPTerm startPrec rhs
 
+  toPTerm p (ICostCentre fc nm tm)
+    = pure (PCostCentre fc !(toPTerm argPrec nm)
+                           !(toPTerm argPrec tm))
+
   mkApp : {auto c : Ref Ctxt Defs} ->
           {auto s : Ref Syn SyntaxInfo} ->
           IPTerm ->

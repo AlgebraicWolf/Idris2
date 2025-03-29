@@ -62,6 +62,7 @@ mutual
   chk env (PrimVal fc x) = pure $ gnf env (chkConstant fc x)
   chk env (TType fc u) = pure (gType fc (MN "top" 0))
   chk env (Erased fc _) = pure (gErased fc)
+  chk env (CostCentre fc _ tm) = chk env tm
 
   chkMeta : {vars : _} ->
             {auto c : Ref Ctxt Defs} ->

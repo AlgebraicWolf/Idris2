@@ -689,8 +689,12 @@ mutual
   quoteGenNF q defs bound env (NErased fc Impossible) = pure $ Erased fc Impossible
   quoteGenNF q defs bound env (NErased fc Placeholder) = pure $ Erased fc Placeholder
   quoteGenNF q defs bound env (NErased fc (Dotted t))
-    = pure $ Erased fc $ Dotted !(quoteGenNF q defs bound env t)
+      = pure $ Erased fc $ Dotted !(quoteGenNF q defs bound env t)
   quoteGenNF q defs bound env (NType fc u) = pure $ TType fc u
+  quoteGenNF q defs bound env (NCostCentre fc nm tm)
+      = do nm' <- quoteGenNF q defs bound env nm
+           tm' <- quoteGenNF q defs bound env tm
+           pure $ CostCentre fc nm' tm'
 
 evalRHS : {vars : _} ->
           {auto c : Ref Ctxt Defs} ->

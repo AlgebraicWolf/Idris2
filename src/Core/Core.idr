@@ -870,7 +870,7 @@ mapTermM f = goTerm where
     goTerm tm@(PrimVal _ _) = f tm
     goTerm tm@(Erased _ _) = f tm
     goTerm tm@(TType _ _) = f tm
-
+    goTerm (CostCentre fc nm tm) = f =<< CostCentre fc <$> goTerm nm <*> goTerm tm
 
 export
 anyM : (a -> Core Bool) -> List a -> Core Bool

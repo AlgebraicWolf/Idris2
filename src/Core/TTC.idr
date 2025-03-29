@@ -314,7 +314,7 @@ mutual
   {vars : _} -> TTC (Term vars) where
     toBuf b (Local {name} fc c idx y)
         = if idx < 243
-             then do tag (13 + cast idx)
+             then do tag (14 + cast idx)
                      toBuf b c
              else do tag 0
                      toBuf b c
@@ -357,6 +357,8 @@ mutual
         = tag 10
     toBuf b (TType fc u)
         = do tag 11; toBuf b u
+    toBuf b (CostCentre fc nm tm)
+        = do tag 13; toBuf b nm; toBuf b tm
 
     fromBuf {vars} b
         = case !getTag of
@@ -392,8 +394,11 @@ mutual
                12 => do fn <- fromBuf b
                         args <- fromBuf b
                         pure (apply emptyFC fn args)
+               13 => do nm <- fromBuf b
+                        tm <- fromBuf b
+                        pure (CostCentre emptyFC nm tm)
                idxp => do c <- fromBuf b
-                          let idx : Nat = fromInteger (cast (idxp - 13))
+                          let idx : Nat = fromInteger (cast (idxp - 14))
                           let Just name = getName idx vars
                               | Nothing => corrupt "Term"
                           pure (Local {name} emptyFC c idx (mkPrf idx))
@@ -731,6 +736,7 @@ mutual
     toBuf b (CPrimVal fc c) = do tag 12; toBuf b fc; toBuf b c
     toBuf b (CErased fc) = do tag 13; toBuf b fc
     toBuf b (CCrash fc msg) = do tag 14; toBuf b fc; toBuf b msg
+    toBuf b (CCostCentre fc nm tm) = do tag 15; toBuf b fc; toBuf b nm; toBuf b tm
 
     fromBuf b
         = assert_total $ case !getTag of
@@ -782,6 +788,10 @@ mutual
                14 => do fc <- fromBuf b
                         msg <- fromBuf b
                         pure (CCrash fc msg)
+               15 => do fc <- fromBuf b
+                        nm <- fromBuf b
+                        tm <- fromBuf b
+                        pure (CCostCentre fc nm tm)
                _ => corrupt "CExp"
 
   export

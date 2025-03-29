@@ -100,6 +100,7 @@ mutual
        NPrimVal : FC -> Constant -> NF vars
        NErased  : FC -> WhyErased (NF vars) -> NF vars
        NType    : FC -> Name -> NF vars
+       NCostCentre : FC -> NF vars -> NF vars -> NF vars
 
 %name LocalEnv lenv
 %name Closure cl
@@ -129,6 +130,7 @@ getLoc (NForce fc _ _ _) = fc
 getLoc (NPrimVal fc _) = fc
 getLoc (NErased fc i) = fc
 getLoc (NType fc _) = fc
+getLoc (NCostCentre fc _ _) = fc
 
 export
 {free : _} -> Show (NHead free) where
@@ -160,6 +162,7 @@ HasNames (NF free) where
   full defs (NPrimVal fc cst) = pure $ NPrimVal fc cst
   full defs (NErased fc imp) = pure $ NErased fc imp
   full defs (NType fc n) = pure $ NType fc !(full defs n)
+  full defs (NCostCentre fc nm tm) = pure $ NCostCentre fc !(full defs nm) !(full defs tm)
 
   resolved defs (NBind fc x bd f) = pure $ NBind fc x bd f
   resolved defs (NApp fc hd xs) = pure $ NApp fc !(resolved defs hd) xs
@@ -172,6 +175,7 @@ HasNames (NF free) where
   resolved defs (NPrimVal fc cst) = pure $ NPrimVal fc cst
   resolved defs (NErased fc imp) = pure $ NErased fc imp
   resolved defs (NType fc n) = pure $ NType fc !(resolved defs n)
+  resolved defs (NCostCentre fc nm tm) = pure $ NCostCentre fc !(resolved defs nm) !(resolved defs tm)
 
 export
 covering
@@ -204,3 +208,4 @@ covering
   show (NPrimVal _ c) = show c
   show (NErased _ _) = "[__]"
   show (NType _ _) = "Type"
+  show (NCostCentre _ nm tm) = "%CostCentre (" ++ show nm ++ ") (" ++ show tm ++ ")"
