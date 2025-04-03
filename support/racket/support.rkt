@@ -615,16 +615,21 @@
 
 ;; For profiling
 
+(define blodwen-call-stack '())
+
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     body]))
+     (dynamic-wind
+       (lambda () (set! blodwen-call-stack (cons name blodwen-call-stack)))
+       (lambda () body)
+       (lambda () (set! blodwen-call-stack (cdr blodwen-call-stack))))]))
 
 (define blodwen-running (make-semaphore))
 
 (define (blodwen-profiler sleep-duration-ns profiled-thread-desc)
   (define (blodwen-current-call-stack)
-    '())
+    blodwen-call-stack)
   (define profile-filename "profile.folded")
   (define (display-trace trace output-port)
     ; Omit the empty stack traces
