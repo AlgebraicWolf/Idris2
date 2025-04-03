@@ -692,7 +692,11 @@
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     body]))
+     (begin
+       (set! blodwen-call-stack (cons name blodwen-call-stack))
+       (let ((res body))
+	 (set! blodwen-call-stack (cdr blodwen-call-stack))
+	 res))]))
 
 ; To avoid losing information about functions in stack trace when
 ; there are calls in tail position, we make sure to create a new
@@ -759,7 +763,9 @@
     [(_ sleep-duration body)
      (begin
        (let ((profiler-thread (fork-thread (blodwen-profiler sleep-duration))))
-         (blodwen-keep-stack-trace)
+         ; In this kind of instrumentation, we don't need a routine
+	 ; that keeps current call stack
+	 ; (blodwen-keep-stack-trace)
          body
          (blodwen-running #f)
          (thread-join profiler-thread)))]))
