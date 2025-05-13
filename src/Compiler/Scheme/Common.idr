@@ -715,9 +715,9 @@ parameters (constants : SortedSet Name)
       escapeName = fastPack . escapeName' . fastUnpack
 
       withCostCentre : Name -> Builder -> Builder
-      withCostCentre name body = "(blodwen-cost-centre \""
+      withCostCentre name body = "(blodwen-cost-centre '|"
                                   ++ singleton (escapeName $ show name)
-                                  ++ "\" "
+                                  ++ "| "
                                   ++ body ++ ")"
 
   schDef n (MkNmError exp)
