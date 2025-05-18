@@ -618,13 +618,19 @@
 (define-syntax blodwen-cost-centre
   (syntax-rules ()
     [(_ name body)
-     body]))
+     (values
+       (with-continuation-mark
+         'blodwen-call-stack
+         name
+         body))]))
 
 (define blodwen-running (make-semaphore))
 
 (define (blodwen-profiler sleep-duration-ns profiled-thread-desc)
   (define (blodwen-current-call-stack)
-    '())
+    (continuation-mark-set->list
+      (continuation-marks profiled-thread-desc)
+      'blodwen-call-stack))
   (define profile-filename "profile.folded")
   (define (display-trace trace output-port)
     ; Omit the empty stack traces
