@@ -516,10 +516,14 @@ compileToSS c prof appdir tm outfile
                                        ++ main ++ ")"
                       Nothing => main
          support <- readDataFile "chez/support.ss"
+         profiler <- case defs.options.session.samplingProfile of
+                       Just _ => readDataFile "chez/profiler.ss"
+                       Nothing => pure ""
          extraRuntime <- getExtraRuntime ds
          let scm = concat $ the (List _)
                    [ schHeader chez (map snd libs ++ loadlibs) True
                    , fromString support
+                   , fromString profiler
                    , fromString extraRuntime
                    , code
                    , collectRequestHandler ++ "\n"
