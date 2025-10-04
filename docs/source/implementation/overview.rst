@@ -493,3 +493,22 @@ Record setters are generated on demand while elaborating TTImp (in
 which means that update of dependent fields works as one might expect (i.e.
 it's safe as long as all of the fields are updated at the same time
 consistently).
+
+Sampling profiler
+-----------------
+
+Chez Scheme and Racket backends feature a sampling profiler system. It regularly
+collects the current call stack and saves the accumulated statistics. These
+operations are regularly performed in a separate thread. The current
+implementation of the collecting thread is designed to work only with
+single-threaded applications.
+
+To obtain the current call stack whenever necessary, the compiled code is
+instrumented with additional instructions. The current call stack is stored
+using continuation marks. There are some differences in the storage
+implementation for Chez Scheme and Racket due to performance differences.
+
+Racket's threads can safely access continuation marks of other threads, so no
+additional syncronization is required. In Chez, a custom timer interrupt handler
+is installed to regularly unwind the current stack and place it in a global
+variable that can be accessed by a profiling thread.

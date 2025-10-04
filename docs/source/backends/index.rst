@@ -65,6 +65,22 @@ running ``:set profile`` at the REPL. The profile data generated will depend
 on the back end you are using. Currently, the Chez and Racket back ends
 support generating profile data.
 
+Instead of the profiling system supplied by the backend, you may choose to use
+the sampling profiler provided for some backends. It is enabled by the
+``sampling-profile``. The flag accepts an optional sampling frequency argument.
+If the frequency is not specified, the default frequency of 1000 Hz will be
+used. The collected samples are stored in the ``profile.folded`` file created in
+the current directory. The file contains recorded call stacks in the following
+format:
+
+..
+
+    func_1;func_2;...;func_n <count>
+
+The statistics gathered by the sampling profiler is intended to be used with
+`flame graphs <https://www.brendangregg.com/flamegraphs.html>`, or any other
+tool capable of processing this format.
+
 There are five code generators provided in Idris 2, and there is
 a system for plugging in new code generators for a variety of targets. The
 default is to compile via Chez Scheme, with an alternative via Racket or Gambit.

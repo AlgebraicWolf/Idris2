@@ -75,6 +75,10 @@ should target this file (`CHANGELOG_NEXT`).
 * Change `flake.nix` to point at `idris-community/idris2-mode` as the URL for
   `inputs.idris-emacs-src` (from the user fork `redfish64/idris2-mode`).
 
+* Added `--sampling-profile` flag, which collects and saves profiling
+  information using a statistical profiler. Currently supported by Chez Scheme
+  and Racket backends. For Chez Scheme, version 10.1.0 or newer is required.
+
 ### Backend changes
 
 #### RefC Backend
