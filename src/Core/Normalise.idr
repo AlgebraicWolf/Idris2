@@ -46,12 +46,22 @@ export
 normalise : {auto c : Ref Ctxt Defs} ->
             {free : _} ->
             Defs -> Env Term free -> Term free -> Core (Term free)
+-- We need to preserve cost centres when normalising.
+normalise defs env (CostCentre fc nm tm) = do
+  nfNm <- normalise defs env nm
+  nfTm <- normalise defs env tm
+  pure $ CostCentre fc nfNm nfTm
 normalise defs env tm = quote defs env !(nf defs env tm)
 
 export
 normaliseOpts : {auto c : Ref Ctxt Defs} ->
                 {free : _} ->
                 EvalOpts -> Defs -> Env Term free -> Term free -> Core (Term free)
+normaliseOpts opts defs env (CostCentre fc nm tm)
+    = do
+        nfNm <- normaliseOpts opts defs env nm
+        nfTm <- normaliseOpts opts defs env tm
+        pure $ CostCentre fc nfNm nfTm
 normaliseOpts opts defs env tm
     = quote defs env !(nfOpts opts defs env tm)
 
@@ -59,8 +69,8 @@ export
 normaliseHoles : {auto c : Ref Ctxt Defs} ->
                  {free : _} ->
                  Defs -> Env Term free -> Term free -> Core (Term free)
-normaliseHoles defs env tm
-    = quote defs env !(nfOpts withHoles defs env tm)
+normaliseHoles
+    = normaliseOpts withHoles
 
 export
 normaliseLHS : {auto c : Ref Ctxt Defs} ->
@@ -69,7 +79,7 @@ normaliseLHS : {auto c : Ref Ctxt Defs} ->
 normaliseLHS defs env (Bind fc n b sc)
     = pure $ Bind fc n b !(normaliseLHS defs (b :: env) sc)
 normaliseLHS defs env tm
-    = quote defs env !(nfOpts onLHS defs env tm)
+    = normaliseOpts onLHS defs env tm
 
 export
 tryNormaliseSizeLimit : {auto c : Ref Ctxt Defs} ->
@@ -96,15 +106,15 @@ export
 normaliseArgHoles : {auto c : Ref Ctxt Defs} ->
                     {free : _} ->
                     Defs -> Env Term free -> Term free -> Core (Term free)
-normaliseArgHoles defs env tm
-    = quote defs env !(nfOpts withArgHoles defs env tm)
+normaliseArgHoles
+    = normaliseOpts withArgHoles
 
 export
 normaliseAll : {auto c : Ref Ctxt Defs} ->
                {free : _} ->
                Defs -> Env Term free -> Term free -> Core (Term free)
-normaliseAll defs env tm
-    = quote defs env !(nfOpts withAll defs env tm)
+normaliseAll
+    = normaliseOpts withAll
 
 -- Normalise, but without normalising the types of binders. Dealing with
 -- binders is the slow part of normalisation so whenever we can avoid it, it's
