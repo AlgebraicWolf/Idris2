@@ -636,14 +636,9 @@ parameters (constants : SortedSet Name)
     schExp i (NmCostCentre fc nm tm)
         = do body <- schExp i tm
              name <- schExp i nm
-             -- TODO only emit a mark when profiling is enabled.
-             -- Would need to drag context to a bunch of places for that
+             -- Would be nice to only emit a mark when the profiling is enabled.
+             -- However, that would require dragging the context around.
              pure $ "(blodwen-cost-centre " ++ name ++ " " ++ body ++ ")"
-             --if isJust defs.options.session.samplingProfile
-             --  then do
-             --    label <- schExp i nm
-             --    pure $ "(blodwen-cost-centre " ++ label ++ " " ++ body ++ ")"
-             --  else pure body
 
   -- External primitives which are common to the scheme codegens (they can be
   -- overridden)

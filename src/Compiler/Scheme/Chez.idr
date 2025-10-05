@@ -509,9 +509,9 @@ compileToSS c prof appdir tm outfile
                                     ++ main ++ ")"
                        else main
          support <- readDataFile "chez/support.ss"
-         profiler <- case defs.options.session.samplingProfile of
-                       Just _ => readDataFile "chez/profiler.ss"
-                       Nothing => pure ""
+         profiler <- if defs.options.session.samplingProfile
+                       then readDataFile "chez/profiler.ss"
+                       else readDataFile "chez/profiler-shim.ss"
          extraRuntime <- getExtraRuntime ds
          let scm = concat $ the (List _)
                    [ schHeader chez (map snd libs ++ loadlibs) True
