@@ -23,6 +23,7 @@ idris2docs_venv
 /tests/**/*.so
 /tests/**/*.dylib
 /tests/**/*.dll
+/tests/**/profile.folded
 /tests/failures
 
 /benchmark/**/build

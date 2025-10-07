@@ -1,0 +1,9 @@
+. ../../../../testutils.sh
+
+run Main.idr --sampling-profile 2>&1
+
+if [ -f profile.folded ] && [ $(wc -l < profile.folded 2>/dev/null) -gt 0 ]; then
+  echo "has profiling info"
+else
+  echo "no profiling info"
+fi

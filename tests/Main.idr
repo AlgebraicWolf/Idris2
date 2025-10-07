@@ -129,6 +129,16 @@ idrisTestsMkdoc = testsInDir "idris2/mkdoc" "HTML documentation generator"
 idrisTestsMisc : IO TestPool
 idrisTestsMisc = testsInDir "idris2/misc" "Misc"
 
+idrisTestsProfilerDisabled : IO TestPool
+idrisTestsProfilerDisabled = testsInDir "idris2/profiler/disabled" "Sampling profiler tests with profiler disabled"
+
+idrisTestsProfilerEnabled : Requirement -> IO TestPool
+idrisTestsProfilerEnabled cg
+  = testsInDir
+      "idris2/profiler/enabled"
+      ("Sampling profiler tests with profiler enabled: " ++ show cg ++ " instance")
+      {codegen = Just cg}
+
 typeddTests : IO TestPool
 typeddTests = testsInDir "typedd-book" "Type Driven Development"
 
@@ -208,6 +218,7 @@ main = (runner =<<) $ sequence $
   , idrisTestsIPKG
   , idrisTestsMkdoc
   , idrisTestsMisc
+  , idrisTestsProfilerDisabled
   , typeddTests
   , ideModeTests
   , preludeTests
@@ -225,3 +236,4 @@ main = (runner =<<) $ sequence $
   ]
   ++ map idrisTestsAllSchemes [Chez, Racket]
   ++ map idrisTestsAllBackends [Chez, Node, Racket, C]
+  ++ map idrisTestsProfilerEnabled [Chez, Racket]

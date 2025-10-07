@@ -1,0 +1,14 @@
+. ../../../../testutils.sh
+
+run Main.idr --sampling-profile 2>&1
+
+# Check that cost centres are mentioned in the collected call stacks
+if [ -f profile.folded ] && [ $(wc -l < profile.folded 2>/dev/null) -gt 0 ]; then \
+  if grep -q 'fib\[30\]' profile.folded && grep -q 'fib\[31\]' profile.folded; then
+    echo "has profiling info and cost centres"
+  else
+    echo "no cost centres"
+  fi
+else
+  echo "no profiling info"
+fi
